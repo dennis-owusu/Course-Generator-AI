@@ -1,8 +1,14 @@
 import express from 'express';
-import { createContent } from '../controllers/content.controller.js';
+import { createContent, generateCourse, getUserCourses, getCourseById } from '../controllers/content.controller.js';
 
-const router = express.Router()
+const router = express.Router();
 
-router.post('/create-content', createContent)
+// Course creation routes
+router.post('/create-content', createContent);
+router.post('/generate-course', generateCourse);
 
-export default router
+// Course retrieval routes
+router.get('/user-courses/:userId', getUserCourses);
+router.get('/course/:courseId', getCourseById);
+
+export default router;
