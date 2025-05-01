@@ -28,7 +28,7 @@ const CourseCard = ({ course }) => {
         <p className="text-sm text-gray-600 line-clamp-2 mb-3">{course.description}</p>
         
         <div className="flex justify-between items-center text-xs text-gray-500">
-          <span>{course.modules?.length || 0} modules</span>
+          <span>{course.modules?.length || 0} chapters</span>
           <span>{course.estimatedDuration} hours</span>
         </div>
         

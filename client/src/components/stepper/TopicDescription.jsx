@@ -52,6 +52,22 @@ const TopicDescription = ({ setActiveIndex, setFormData, formData }) => {
             required
           />
         </div>
+
+        <div>
+          <label htmlFor="chapterCount" className="block text-sm font-medium mb-2">Number of Chapters</label>
+          <input
+            type="number"
+            id="chapterCount"
+            name="chapterCount"
+            value={formData.chapterCount || ''}
+            onChange={handleChange}
+            min="1"
+            max="20"
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            required
+            placeholder="How many chapters do you want in your course?"
+          />
+        </div>
       </div>
 
       <div className="mt-8 flex justify-between">
@@ -64,7 +80,7 @@ const TopicDescription = ({ setActiveIndex, setFormData, formData }) => {
         </Button>
         <Button 
           onClick={() => setActiveIndex(2)} 
-          disabled={!formData.topic || !formData.estimatedDuration}
+          disabled={!formData.topic || !formData.estimatedDuration || !formData.chapterCount}
           className="px-6"
         >
           Next

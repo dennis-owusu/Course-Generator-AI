@@ -26,7 +26,8 @@ const CreateCourse = () => {
         estimatedDuration: '',
         level: '',
         learningGoal: '',
-        userId: ''
+        userId: '',
+        chapterCount: '5' // Default to 5 chapters
     })
 
     useEffect(() => {
@@ -66,7 +67,8 @@ const CreateCourse = () => {
                 estimatedDuration: parseInt(formData.estimatedDuration),
                 category: formData.category,
                 userId: formData.userId,
-                description: formData.description || `A course about ${formData.topic}`
+                description: formData.description || `A course about ${formData.topic}`,
+                chapterCount: parseInt(formData.chapterCount || '5') // Default to 5 chapters if not specified
             })
             
             setGeneratedCourse(response.data.course)

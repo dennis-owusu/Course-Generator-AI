@@ -17,7 +17,7 @@ An AI application where students can create personalized courses using AI techno
 
 - Node.js and npm installed
 - MongoDB database
-- OpenRouter API key (for Google Gemini Flash)
+- GitHub API token (for GPT-4o API)
 - YouTube Data API key
 
 ### Environment Variables
@@ -26,7 +26,7 @@ Create a `.env` file in the root directory with the following variables:
 
 ```
 MONGODB_URI=your_mongodb_connection_string
-GOOGLE_FLASH_API_KEY=your_openrouter_api_key
+GPT40_API_KEY=your_github_gpt4o_api_key
 YOUTUBE_API_KEY=your_youtube_api_key
 PORT=3000
 ```
@@ -68,5 +68,5 @@ PORT=3000
 
 ### AI Integration
 
-- **Google Gemini Flash via OpenRouter**: Used to generate comprehensive, educational notes for each lesson with detailed explanations
+- **GitHub GPT-4o API**: Used to generate comprehensive, educational notes for each lesson with detailed explanations
 - **YouTube Data API**: Used to find relevant educational videos that complement the lesson content

@@ -1,6 +1,7 @@
 import Content from "../models/content.model.js";
 import axios from 'axios';
 import dotenv from 'dotenv';
+import { generateWithGitHubAI } from '../utils/githubAI.js';
 
 // Ensure environment variables are loaded
 dotenv.config();
@@ -249,7 +250,7 @@ function determineModuleCount(level, estimatedDuration) {
 // Helper function to generate modules and lessons
 function generateModules(courseStructure, topic, level, moduleCount) {
     // Define module templates based on common course progression
-    const moduleTemplates = [
+    const moduleTemplates = [ 
         {
             title: `Introduction to ${topic}`,
             description: `Learn the fundamentals of ${topic} and understand why it's important.`,
@@ -259,22 +260,19 @@ function generateModules(courseStructure, topic, level, moduleCount) {
                     title: `Getting Started with ${topic}`,
                     summary: `An overview of ${topic} and its significance.`,
                     content: `This lesson introduces you to ${topic}, explaining its core concepts and importance in the field. You'll learn about the history, current applications, and future trends of ${topic}.`,
-                    duration: 20,
-                    quizCount: 2
+                    duration: 20
                 },
                 {
                     title: `Key Concepts in ${topic}`,
                     summary: `Understanding the fundamental principles of ${topic}.`,
                     content: `This lesson covers the essential concepts and terminology you need to know to build a strong foundation in ${topic}. We'll break down complex ideas into easy-to-understand components.`,
-                    duration: 25,
-                    quizCount: 3
+                    duration: 25
                 },
                 {
                     title: `${topic} in Practice`,
                     summary: `See how ${topic} is applied in real-world scenarios.`,
                     content: `This lesson demonstrates practical applications of ${topic} through real-world examples and case studies. You'll gain insight into how professionals use ${topic} to solve problems and create value.`,
-                    duration: 30,
-                    quizCount: 2
+                    duration: 30
                 }
             ]
         },
@@ -287,22 +285,19 @@ function generateModules(courseStructure, topic, level, moduleCount) {
                     title: `Essential ${topic} Techniques`,
                     summary: `Learn the fundamental techniques used in ${topic}.`,
                     content: `This lesson teaches you the core techniques that form the backbone of ${topic}. You'll learn step-by-step approaches to common tasks and challenges.`,
-                    duration: 35,
-                    quizCount: 3
+                    duration: 35
                 },
                 {
                     title: `Problem Solving with ${topic}`,
                     summary: `Apply ${topic} principles to solve common problems.`,
                     content: `This lesson focuses on developing your problem-solving skills using ${topic}. You'll work through examples that demonstrate how to approach and resolve typical challenges.`,
-                    duration: 40,
-                    quizCount: 3
+                    duration: 40
                 },
                 {
                     title: `Building Your First ${topic} Project`,
                     summary: `Create a simple project using your new ${topic} skills.`,
                     content: `This lesson guides you through creating your first project with ${topic}. You'll apply what you've learned so far to build something tangible and gain hands-on experience.`,
-                    duration: 45,
-                    quizCount: 2
+                    duration: 45
                 }
             ]
         },
@@ -315,22 +310,19 @@ function generateModules(courseStructure, topic, level, moduleCount) {
                     title: `Advanced ${topic} Theory`,
                     summary: `Explore complex theoretical aspects of ${topic}.`,
                     content: `This lesson delves into the advanced theoretical foundations of ${topic}. You'll examine sophisticated concepts that underpin modern applications and research in the field.`,
-                    duration: 40,
-                    quizCount: 3
+                    duration: 40
                 },
                 {
                     title: `Specialized ${topic} Techniques`,
                     summary: `Master specialized techniques used by ${topic} professionals.`,
                     content: `This lesson introduces you to specialized techniques that are used by experts in ${topic}. You'll learn approaches that go beyond the basics and enable more sophisticated applications.`,
-                    duration: 45,
-                    quizCount: 3
+                    duration: 45
                 },
                 {
                     title: `Optimizing ${topic} Performance`,
                     summary: `Learn how to optimize and improve ${topic} implementations.`,
                     content: `This lesson focuses on optimization strategies for ${topic}. You'll discover methods to enhance efficiency, effectiveness, and overall performance in your ${topic} work.`,
-                    duration: 50,
-                    quizCount: 3
+                    duration: 50
                 }
             ]
         },
@@ -343,22 +335,19 @@ function generateModules(courseStructure, topic, level, moduleCount) {
                     title: `${topic} Case Studies`,
                     summary: `Analyze real-world examples of ${topic} in action.`,
                     content: `This lesson presents detailed case studies that demonstrate ${topic} in real-world contexts. You'll analyze how ${topic} principles are applied to solve complex problems across different industries.`,
-                    duration: 35,
-                    quizCount: 2
+                    duration: 35
                 },
                 {
                     title: `Current Trends in ${topic}`,
                     summary: `Explore the latest developments and trends in ${topic}.`,
                     content: `This lesson examines current trends and emerging developments in the field of ${topic}. You'll learn about cutting-edge applications, research directions, and how the field is evolving.`,
-                    duration: 30,
-                    quizCount: 2
+                    duration: 30
                 },
                 {
                     title: `${topic} Best Practices`,
                     summary: `Learn industry-standard best practices for ${topic}.`,
                     content: `This lesson covers established best practices in ${topic} that professionals follow. You'll learn guidelines, standards, and approaches that ensure quality and effectiveness in your ${topic} work.`,
-                    duration: 40,
-                    quizCount: 3
+                    duration: 40
                 }
             ]
         },
@@ -371,22 +360,19 @@ function generateModules(courseStructure, topic, level, moduleCount) {
                     title: `Advanced ${topic} Project`,
                     summary: `Build a comprehensive project showcasing advanced ${topic} skills.`,
                     content: `This lesson guides you through creating a sophisticated project that demonstrates mastery of ${topic}. You'll apply advanced concepts and techniques to create something impressive for your portfolio.`,
-                    duration: 60,
-                    quizCount: 2
+                    duration: 60
                 },
                 {
                     title: `Troubleshooting ${topic} Issues`,
                     summary: `Learn to identify and resolve common problems in ${topic}.`,
                     content: `This lesson focuses on troubleshooting and debugging in ${topic}. You'll learn systematic approaches to identifying, diagnosing, and resolving issues that commonly arise in ${topic} work.`,
-                    duration: 45,
-                    quizCount: 3
+                    duration: 45
                 },
                 {
                     title: `${topic} Integration Strategies`,
                     summary: `Discover how to integrate ${topic} with other systems and technologies.`,
                     content: `This lesson explores how ${topic} can be integrated with other technologies and systems. You'll learn strategies for creating cohesive solutions that leverage multiple tools and approaches.`,
-                    duration: 50,
-                    quizCount: 3
+                    duration: 50
                 }
             ]
         }
@@ -483,164 +469,147 @@ function generateAdditionalModules(topic, count) {
     return additionalModules;
 }
 
-// Helper function to generate quiz questions for a lesson
+// Note: Quiz generation functionality has been removed to simplify the course structure
 function generateQuizQuestions(topic, lessonTitle, count) {
-    const quizQuestions = [];
-    
-    // Generic question templates that can be adapted to different topics
-    const questionTemplates = [
-        {
-            question: `Which of the following best describes ${topic}?`,
-            options: [
-                `A systematic approach to understanding and applying ${topic} principles`,
-                `A theoretical framework with limited practical applications`,
-                `A recent innovation with no historical background`,
-                `A specialized field only relevant to academic research`
-            ],
-            correctAnswer: 0
-        },
-        {
-            question: `What is a key benefit of mastering ${topic}?`,
-            options: [
-                `Increased career opportunities in related fields`,
-                `Reduced need for continuing education`,
-                `Simplified problem-solving approaches`,
-                `Elimination of the need for specialized tools`
-            ],
-            correctAnswer: 0
-        },
-        {
-            question: `Which of these is NOT typically associated with ${topic}?`,
-            options: [
-                `Oversimplification of complex systems`,
-                `Systematic analysis and evaluation`,
-                `Evidence-based approaches`,
-                `Continuous improvement and refinement`
-            ],
-            correctAnswer: 0
-        },
-        {
-            question: `In the context of ${lessonTitle}, what is most important to consider?`,
-            options: [
-                `The underlying principles and their applications`,
-                `Only the historical development`,
-                `Memorizing terminology without understanding concepts`,
-                `Focusing on theory while ignoring practical applications`
-            ],
-            correctAnswer: 0
-        },
-        {
-            question: `Which approach is generally most effective when learning about ${topic}?`,
-            options: [
-                `Combining theoretical knowledge with practical application`,
-                `Focusing exclusively on theoretical concepts`,
-                `Memorizing facts without understanding context`,
-                `Learning advanced concepts before mastering fundamentals`
-            ],
-            correctAnswer: 0
-        },
-        {
-            question: `What distinguishes experts in ${topic} from beginners?`,
-            options: [
-                `Their ability to apply principles flexibly across different contexts`,
-                `Their memorization of terminology`,
-                `Their focus on only one aspect of the field`,
-                `Their avoidance of fundamental concepts`
-            ],
-            correctAnswer: 0
-        }
-    ];
-    
-    // Select random questions from templates up to the requested count
-    const selectedIndices = new Set();
-    while (selectedIndices.size < Math.min(count, questionTemplates.length)) {
-        selectedIndices.add(Math.floor(Math.random() * questionTemplates.length));
-    }
-    
-    // Add selected questions to the result
-    Array.from(selectedIndices).forEach(index => {
-        quizQuestions.push(questionTemplates[index]);
-    });
-    
-    return quizQuestions;
+    // Return empty array as quiz functionality has been removed
+    return [];
 }
 
 // Helper function to validate YouTube API key
-// Function to generate lesson notes using Anthropic Claude AI
+// Function to generate lesson notes using GitHub's GPT-40 API
+// Generate lesson notes locally without relying on external APIs
 async function generateLessonNotes(topic, lessonTitle, level) {
     try {
-        if (!process.env.GOOGLE_FLASH_API_KEY) {
-            console.warn('OpenRouter API key is not set in environment variables');
-            return null;
+        console.log(`Generating AI content for lesson: ${lessonTitle}`);
+        
+        // Create a detailed prompt for the GitHub AI model
+        const prompt = `
+            Create comprehensive educational content for a lesson titled "${lessonTitle}" 
+            within a course about "${topic}" at a ${level} level.
+            
+            The content should include:
+            - A clear introduction explaining the importance of this topic
+            - Detailed explanations of key concepts
+            - Practical applications and examples
+            - Historical context where relevant
+            - Common misconceptions and clarifications
+            - Best practices and tips
+            - A summary of the main points
+            
+            Format the content with Markdown headings and bullet points for readability.
+            Ensure the content is accurate, educational, and engaging for ${level.toLowerCase()} level students.
+        `;
+        
+        // Generate content using GitHub's AI model
+        const aiContent = await generateWithGitHubAI(prompt);
+        
+        // If AI generation fails, fall back to local content generation
+        if (!aiContent) {
+            console.log(`Falling back to local content generation for lesson: ${lessonTitle}`);
+            return generateLocalContent(topic, lessonTitle, level);
         }
         
-        const API_KEY = process.env.GOOGLE_FLASH_API_KEY;
-        const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-        
-        // Create a prompt that will generate comprehensive educational content
-        const systemPrompt = "You are an expert educational content creator specializing in creating comprehensive, accurate, and engaging lesson notes.";
-        
-        const userPrompt = `Create comprehensive educational notes for a ${level} level lesson titled "${lessonTitle}" 
-            about ${topic}. The notes should include:
-            
-            1. Key concepts and definitions
-            2. Detailed explanations with examples
-            3. Important points to remember
-            4. Practical applications
-            5. Common misconceptions and how to avoid them
-            6. Step-by-step guides where applicable
-            
-            Format the content with proper Markdown headings, bullet points, and emphasis where appropriate.
-            Keep the content educational, accurate, and engaging for students.
-            Provide enough detail that a student could learn the entire topic just from reading these notes.`;
-        
-        const response = await axios.post(
-            OPENROUTER_API_URL,
-            {
-                model: "google/gemini-flash", // Using Google's Gemini Flash model through OpenRouter
-                messages: [
-                    {
-                        role: "system",
-                        content: systemPrompt
-                    },
-                    {
-                        role: "user",
-                        content: userPrompt
-                    }
-                ],
-                max_tokens: 4000,
-                temperature: 0.7
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${API_KEY}`,
-                    'HTTP-Referer': 'https://course-generator-ai.com', // Replace with your actual domain
-                    'X-Title': 'Course Generator AI'
-                }
-            }
-        );
-        
-        // Extract the generated text from the response
-        if (response.data && 
-            response.data.choices && 
-            response.data.choices.length > 0 && 
-            response.data.choices[0].message &&
-            response.data.choices[0].message.content) {
-            
-            return response.data.choices[0].message.content;
-        }
-        
-        console.warn('Unexpected OpenRouter API response structure');
-        return null;
-        
+        return aiContent;
     } catch (error) {
-        console.error('Error generating lesson notes with OpenRouter API:', error.message);
-        if (error.response) {
-            console.error('OpenRouter API error response:', error.response.data);
-        }
-        return null;
+        console.error('Error generating lesson notes with AI:', error.message);
+        // Fall back to local content generation
+        console.log(`Falling back to local content generation for lesson: ${lessonTitle}`);
+        return generateLocalContent(topic, lessonTitle, level);
     }
+}
+
+// Helper function to generate content locally without external API calls
+function generateLocalContent(topic, lessonTitle, level) {
+    // Determine depth and complexity based on level
+    const complexityLevel = level === 'Beginner' ? 'fundamental' : 
+                           level === 'Intermediate' ? 'intermediate' : 'advanced';
+    
+    // Create a structured content template
+    const content = `# ${lessonTitle}
+
+## Introduction
+
+This lesson explores ${lessonTitle.toLowerCase()} in the context of ${topic}. We'll cover the ${complexityLevel} concepts, practical applications, and best practices to help you master this subject.
+
+## Key Concepts
+
+### What is ${lessonTitle.split(' ').pop()}?
+
+${lessonTitle.split(' ').pop()} is a crucial component of ${topic} that involves understanding how different elements interact and function together. At the ${level.toLowerCase()} level, we focus on ${level === 'Beginner' ? 'building a solid foundation' : level === 'Intermediate' ? 'expanding your knowledge with more complex scenarios' : 'mastering advanced techniques and theoretical frameworks'}.
+
+### Core Principles
+
+1. **Fundamental Understanding**: Grasp the basic concepts and terminology related to ${topic} and ${lessonTitle.toLowerCase()}
+2. **Practical Application**: Learn how to apply these concepts in real-world scenarios
+3. **Problem-Solving Approach**: Develop strategies to address common challenges in this area
+4. **Integration Knowledge**: Understand how ${lessonTitle.toLowerCase()} connects with other aspects of ${topic}
+
+## Detailed Explanation
+
+${lessonTitle} encompasses several important aspects that are essential for anyone studying ${topic}. Let's explore these in detail:
+
+### Historical Context
+
+The development of ${lessonTitle.toLowerCase()} within ${topic} has evolved significantly over time. Initially, practitioners focused on ${level === 'Beginner' ? 'basic implementation and understanding' : level === 'Intermediate' ? 'improving efficiency and expanding applications' : 'theoretical advancements and pushing boundaries'}. This evolution has shaped how we approach ${topic} today.
+
+### Practical Applications
+
+${lessonTitle} is applied in numerous real-world scenarios, including:
+
+- Professional environments where ${topic} expertise is required
+- Research and development of new ${topic} methodologies
+- Educational contexts for teaching ${topic} concepts
+- Personal projects that leverage ${topic} for creative or practical solutions
+
+### Common Misconceptions
+
+When studying ${lessonTitle.toLowerCase()}, students often encounter these misconceptions:
+
+1. **Oversimplification**: Assuming that ${topic} concepts are simpler than they actually are
+2. **Scope Limitations**: Not recognizing how broadly ${lessonTitle.toLowerCase()} applies across different domains
+3. **Static Knowledge**: Treating ${topic} as a fixed body of knowledge rather than an evolving field
+
+## Best Practices
+
+To master ${lessonTitle.toLowerCase()}, consider these best practices:
+
+1. **Regular Practice**: Consistently apply what you learn about ${topic}
+2. **Diverse Examples**: Study ${lessonTitle.toLowerCase()} across multiple contexts and applications
+3. **Peer Learning**: Discuss ${topic} concepts with others to deepen understanding
+4. **Applied Projects**: Create projects that implement ${lessonTitle.toLowerCase()} principles
+
+## Advanced Considerations
+
+${level === 'Advanced' ? `As an advanced student of ${topic}, you should consider these sophisticated aspects of ${lessonTitle.toLowerCase()}:
+
+1. **Theoretical Frameworks**: Understand the underlying theories that inform current practices
+2. **Edge Cases**: Explore unusual or challenging scenarios where standard approaches may fail
+3. **Innovation Opportunities**: Identify areas where new approaches to ${lessonTitle.toLowerCase()} could advance the field
+` : level === 'Intermediate' ? `As you progress in your study of ${topic}, consider these more nuanced aspects of ${lessonTitle.toLowerCase()}:
+
+1. **Efficiency Optimization**: Learn techniques to improve the effectiveness of your approaches
+2. **Integration Challenges**: Understand how to combine ${lessonTitle.toLowerCase()} with other aspects of ${topic}
+3. **Adaptability**: Develop the ability to modify approaches based on specific contexts
+` : `As you continue learning about ${topic}, you'll eventually explore these more advanced aspects of ${lessonTitle.toLowerCase()}:
+
+1. **Building Complexity**: How to move from basic to more sophisticated implementations
+2. **Connecting Concepts**: Understanding how ${lessonTitle.toLowerCase()} relates to other fundamental aspects of ${topic}
+3. **Preparation for Advancement**: Key areas to focus on as you progress to intermediate studies
+`}
+
+## Summary
+
+In this lesson on ${lessonTitle.toLowerCase()}, we've covered:
+
+- The fundamental concepts and principles of ${lessonTitle.toLowerCase()} in ${topic}
+- Practical applications and real-world relevance
+- Common misconceptions and how to avoid them
+- Best practices for mastering this subject area
+- ${level === 'Beginner' ? 'Foundations for future learning' : level === 'Intermediate' ? 'More advanced considerations as you progress' : 'Sophisticated aspects for expert-level understanding'}
+
+Continue practicing these concepts and applying them in different contexts to deepen your understanding of ${topic}.`;
+    
+    return content;
 }
 
 // Function to enrich course with AI-generated notes
@@ -666,7 +635,7 @@ async function enrichCourseWithNotes(courseStructure, topic) {
                         successfulGenerations++;
                     }
                 } catch (lessonError) {
-                    console.error(`Error generating notes for lesson "${lesson.title}" with Claude:`, lessonError.message);
+                    console.error(`Error generating notes for lesson "${lesson.title}" with GPT-4o:`, lessonError.message);
                     // Continue with next lesson
                 }
             }

@@ -107,7 +107,7 @@ const CourseDetail = () => {
                     className={`w-full text-left p-3 font-medium flex justify-between items-center ${activeModule === moduleIndex ? 'bg-primary text-white' : 'bg-gray-100'}`}
                     onClick={() => handleModuleClick(moduleIndex)}
                   >
-                    <span>{module.title}</span>
+                    <span>Chapter {moduleIndex + 1}: {module.title}</span>
                     <span className="text-xs">{module.lessons.length} lessons</span>
                   </button>
                   
@@ -148,18 +148,31 @@ const CourseDetail = () => {
                   </div>
                 )}
                 
-                {/* AI-generated notes section */}
-                {currentLesson.aiNotes && (
-                  <div className="mb-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
-                    <h3 className="text-lg font-semibold mb-3 flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                      </svg>
-                      AI-Generated Study Notes
-                    </h3>
-                    <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: marked.parse(currentLesson.aiNotes) }}></div>
+                {/* AI-generated notes section with fallback */}
+                <div className="mb-6 bg-blue-50 p-4 rounded-lg border border-blue-100">
+                  <h3 className="text-lg font-semibold mb-3 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                    Study Notes
+                  </h3>
+                  <div className="prose max-w-none">
+                    {currentLesson.aiNotes ? (
+                      <div dangerouslySetInnerHTML={{ __html: marked.parse(currentLesson.aiNotes) }}></div>
+                    ) : (
+                      <div>
+                        <p>This chapter covers key concepts related to {currentLesson.title}.</p>
+                        <p>The main points include:</p>
+                        <ul>
+                          <li>Understanding the fundamentals of {currentLesson.title}</li>
+                          <li>Practical applications and examples</li>
+                          <li>Best practices and implementation strategies</li>
+                        </ul>
+                        <p>Review the lesson content for detailed information on these topics.</p>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
                 
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold mb-2">Summary</h3>
@@ -175,31 +188,7 @@ const CourseDetail = () => {
                   </div>
                 </div>
                 
-                {currentLesson.quizQuestions && currentLesson.quizQuestions.length > 0 && (
-                  <div className="mt-8 border-t pt-6">
-                    <h3 className="text-lg font-semibold mb-4">Knowledge Check</h3>
-                    <div className="space-y-6">
-                      {currentLesson.quizQuestions.map((quiz, quizIndex) => (
-                        <div key={quizIndex} className="bg-gray-50 p-4 rounded-lg">
-                          <p className="font-medium mb-3">{quiz.question}</p>
-                          <div className="space-y-2">
-                            {quiz.options.map((option, optionIndex) => (
-                              <div key={optionIndex} className="flex items-center">
-                                <input
-                                  type="radio"
-                                  id={`quiz-${quizIndex}-option-${optionIndex}`}
-                                  name={`quiz-${quizIndex}`}
-                                  className="mr-2"
-                                />
-                                <label htmlFor={`quiz-${quizIndex}-option-${optionIndex}`}>{option}</label>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                {/* Quiz section removed as requested */}
                 
                 <div className="mt-8 flex justify-between">
                   <Button
