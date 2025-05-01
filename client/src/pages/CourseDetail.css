@@ -1,0 +1,198 @@
+/* Custom scrollbar styling for CourseDetail component */
+
+/* Custom scrollbar for the course content sidebar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Enhanced styling for study notes */
+.study-notes-container {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.study-notes-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.study-notes-header h3 {
+  color: #4f46e5;
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.study-notes-content {
+  animation: fadeIn 0.3s ease-in-out;
+  font-size: 1.15rem;
+}
+
+.study-notes-content h4 {
+  color: #6366f1;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 1.5rem 0 1rem;
+}
+
+.study-notes-content p {
+  color: #4b5563;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.study-notes-content ul {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.study-notes-content li {
+  color: #4b5563;
+  margin-bottom: 0.75rem;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.study-notes-content li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5rem;
+  width: 6px;
+  height: 6px;
+  background-color: #818cf8;
+  border-radius: 50%;
+}
+
+.study-notes-content strong,
+.study-notes-content b {
+  color: #4338ca;
+  font-weight: 600;
+}
+
+.study-notes-content code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.9em;
+  background-color: #f1f5f9;
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+}
+
+.study-notes-content pre {
+  background-color: #f8fafc;
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  margin: 1.5rem 0;
+}
+
+.study-notes-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.study-notes-content th,
+.study-notes-content td {
+  border: 1px solid #e2e8f0;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.study-notes-content th {
+  background-color: #eef2ff;
+  color: #4338ca;
+  font-weight: 600;
+}
+
+.study-notes-content tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+/* Animation for content transitions */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Fallback styles for when AI notes are not available */
+.study-notes-fallback {
+  background-color: #fafafa;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.notes-section {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  color: #4338ca;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.section-content {
+  color: #4b5563;
+  line-height: 1.7;
+}
+
+.highlight {
+  color: #4338ca;
+  font-weight: 500;
+}
+
+.key-points-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.key-point {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.point-icon::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5rem;
+  width: 6px;
+  height: 6px;
+  background-color: #818cf8;
+  border-radius: 50%;
+}
+
+.point-text {
+  color: #4b5563;
+  line-height: 1.5;
+}
