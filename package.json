@@ -8,10 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon api/index.js",
     "start": "node api/index.js",
-    "build:client": "cd client && npm install && npm run build",
-    "build:server": "npm install",
-    "build": "npm run build:server && npm run build:client",
-    "postbuild": "if exist client\\dist mkdir public && xcopy /E /I client\\dist public || mkdir -p public && cp -r client/dist/* public/"
+    "build": "npm install && npm install --prefix client && npm run build --prefix client"
   },
   "keywords": [],
   "author": "",

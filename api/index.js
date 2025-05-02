@@ -12,6 +12,7 @@ dotenv.config();
 
 const PORT = 3000
 const app = express(); 
+const __dirname = path.resolve();
 //middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -26,18 +27,23 @@ app.use('/api/content', contentRoute)
 app.use('/api/auth', authRoute)
 
 // Serve static files from the public directory in production
-if (process.env.NODE_ENV === 'production') {
-    const __dirname = path.dirname(fileURLToPath(import.meta.url));
-    const publicPath = path.join(__dirname, '..', 'public');
-    
-    app.use(express.static(publicPath));
-    
-    // Handle all other routes by serving the index.html
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(publicPath, 'index.html'));
-    });
-}
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+app.use(express.static(path.join(__dirname, '/client/dist')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
 });
+
+
+app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Internal Server Error';
+    res.status(statusCode).json({
+      success: false,
+      statusCode,
+      message,
+    });
+  });
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
