@@ -34,6 +34,27 @@ const CourseDetail = () => {
     fetchCourse()
   }, [courseId])
 
+  const handleNextLesson = () => {
+    if (activeLesson < currentModule.lessons.length - 1) {
+      setActiveLesson(activeLesson + 1)
+    } else if (activeModule < course.modules.length - 1) {
+      setActiveModule(activeModule + 1)
+      setActiveLesson(0)
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handlePreviousLesson = () => {
+    if (activeLesson > 0) {
+      setActiveLesson(activeLesson - 1)
+    } else if (activeModule > 0) {
+      setActiveModule(activeModule - 1)
+      setActiveLesson(course.modules[activeModule - 1].lessons.length - 1)
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+
   const handleModuleClick = (index) => {
     setActiveModule(index)
     setActiveLesson(0) // Reset to first lesson when changing modules
@@ -294,11 +315,14 @@ const CourseDetail = () => {
                     <Button
                       variant="outline"
                       disabled={activeLesson === 0}
-                      onClick={() => setActiveLesson(activeLesson - 1)}
+                      onClick={() => {
+                        setActiveLesson(activeLesson - 1)
+                        handlePreviousLesson()
+                      }}
                     >
                       Previous Lesson
                     </Button>
-                    <Button
+                    <Button className='bg-indigo-600 hover:bg-indigo-700'
                       disabled={activeLesson === currentModule.lessons.length - 1 && activeModule === course.modules.length - 1}
                       onClick={() => {
                         if (activeLesson < currentModule.lessons.length - 1) {
@@ -307,6 +331,7 @@ const CourseDetail = () => {
                           setActiveModule(activeModule + 1)
                           setActiveLesson(0)
                         }
+                        handleNextLesson()
                       }}
                     >
                       Next Lesson
