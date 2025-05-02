@@ -4,6 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import contentRoute from './routes/content.route.js'
+import authRoute from './routes/auth.route.js';
 
 dotenv.config(); 
 
@@ -20,6 +21,7 @@ mongoose.connect(process.env.MONGODB_URI).then(() => { console.log('Connected to
 
  
 app.use('/api/content', contentRoute)
+app.use('/api/auth', authRoute)
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

@@ -5,6 +5,7 @@ import SignUp from './authentication/SignUp'
 import Dashboard from './pages/Dashboard'
 import CreateCourse from './pages/CreateCourse'
 import CourseDetail from './pages/CourseDetail'
+import SignIn from './authentication/SignIn'
 
 function App() {
 
@@ -13,7 +14,8 @@ function App() {
     <BrowserRouter>
     <Routes>
       <Route path='/' element={<Home/>}/>
-      <Route path='/sign-up' element={<SignUp/>}/>
+      <Route path='/signin' element={<SignIn/>}/>
+      <Route path='/signup' element={<SignUp/>}/>
       <Route path='/dashboard' element={<Dashboard/>}/>
       <Route path='/create-course' element={<CreateCourse/>}/>
       <Route path='/course/:courseId' element={<CourseDetail/>}/>

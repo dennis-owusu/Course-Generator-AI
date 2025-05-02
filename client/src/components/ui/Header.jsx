@@ -1,6 +1,5 @@
 
 import React from 'react'
-import { UserButton } from '@clerk/clerk-react'
 
 const Header = () => {
   return (
@@ -10,11 +9,6 @@ const Header = () => {
     <div className="flex gap-4 flex-row items-center justify-between">
       <div>
         <img className='w-16 h-16' src="/logo.png" alt="" />
-      </div>
-
-      <div className="flex items-center gap-4">
-          <UserButton/>
-
       </div>
     </div>
   </div>

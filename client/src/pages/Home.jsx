@@ -2,19 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { cn } from '../lib/utils'; // Ensure this utility function is available
 import { useNavigate } from "react-router-dom";
-import { SignedIn, SignedOut, SignInButton, useAuth } from "@clerk/clerk-react";
 
 export const Home = () => {
 
 
   const navigate = useNavigate();
-  const { isSignedIn } = useAuth(); // Use Clerk's `useAuth` to check sign-in status
-
-  useEffect(() => {
-    if (isSignedIn) {
-      navigate("/dashboard"); // Redirect if user is signed in
-    }
-  }, [isSignedIn, navigate]);
 
 return (
     <div className="relative h-screen bg-slate-950 flex flex-col">
@@ -32,14 +24,8 @@ return (
             <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           </span>
           <div className="relative flex justify-center w-full text-center space-x-2 h-full items-center z-10 rounded-full bg-zinc-950 py-1 px-2 ring-1 ring-white/10">
-            <span className="md:text-2xl text-lg inline-block bg-clip-text text-transparent bg-gradient-to-r from-neutral-300 via-neutral-600 to-neutral-300">
-            <SignedOut>
-            <SignInButton>
+            <span onClick={()=>navigate('/signup')} className="md:text-2xl text-lg inline-block bg-clip-text text-transparent bg-gradient-to-r from-neutral-300 via-neutral-600 to-neutral-300">
                   Get Started
-
-            </SignInButton>
-                
-              </SignedOut>
             </span>
           </div>
         </div>
@@ -51,13 +37,7 @@ return (
 const Navbar = () => {
 
   const navigate = useNavigate();
-  const { isSignedIn } = useAuth(); // Use Clerk's `useAuth` to check sign-in status
 
-  useEffect(() => {
-    if (isSignedIn) {
-      navigate("/dashboard"); // Redirect if user is signed in
-    }
-  }, [isSignedIn, navigate]);
 
   return (
     <nav className="p-4 shadow-md">
@@ -69,14 +49,8 @@ const Navbar = () => {
             <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           </span>
           <div className="relative flex justify-center w-full text-center space-x-2 h-full items-center z-10 rounded-full bg-zinc-950 py-1 px-2 ring-1 ring-white/10">
-            <span className="md:text-2xl text-lg inline-block bg-clip-text text-transparent bg-gradient-to-r from-neutral-300 via-neutral-600 to-neutral-300">
-            <SignedOut>
-            <SignInButton>
+            <span onClick={()=>navigate('/signup')} className="md:text-2xl text-lg inline-block bg-clip-text text-transparent bg-gradient-to-r from-neutral-300 via-neutral-600 to-neutral-300">
                   Get Started
-
-            </SignInButton>
-                
-              </SignedOut>
             </span>
           </div>
         </div>

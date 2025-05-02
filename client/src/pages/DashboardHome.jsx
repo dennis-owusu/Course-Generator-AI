@@ -1,24 +1,23 @@
-import { useUser } from '@clerk/clerk-react'
 import { Button } from '../components/ui/button'
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import CourseCard from '../components/CourseCard'
+import { useSelector } from 'react-redux'
 
 const DashboardHome = () => {
     const navigate = useNavigate()
-    const { user } = useUser()
     const [courses, setCourses] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
+    const {currentUser} = useSelector(state => state.user)
 
     useEffect(() => {
         const fetchUserCourses = async () => {
-            if (!user) return
             
             try {
                 setLoading(true)
-                const response = await axios.get(`http://localhost:3000/api/content/user-courses/${user.id}`)
+                const response = await axios.get(`http://localhost:3000/api/content/user-courses/${currentUser._id}`)
                 setCourses(response.data)
             } catch (err) {
                 console.error('Error fetching courses:', err)
@@ -29,12 +28,11 @@ const DashboardHome = () => {
         }
 
         fetchUserCourses()
-    }, [user])
+    }, [])
 
     return (
-        <div className="mx-10 my-5">
-            <div className="flex justify-between items-center mb-8">
-                <h2 className="text-2xl font-semibold">Hello, <span>{user?.fullName}</span></h2>
+        <div className="mx-10 my-5">           <div className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl font-semibold">Hello, <span>{currentUser?.name || 'there'}</span></h2>
                 <Button onClick={() => navigate('/create-course')} className="px-6">
                     Create New Course
                 </Button>

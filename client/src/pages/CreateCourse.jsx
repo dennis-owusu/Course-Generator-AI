@@ -7,17 +7,18 @@ import { Button } from '@/components/ui/button'
 import React, { useState, useEffect } from 'react'
 import { HiClipboardDocumentCheck, HiLightBulb, HiMiniSquares2X2 } from 'react-icons/hi2'
 import { useNavigate } from 'react-router-dom'
-import { useUser } from '@clerk/clerk-react'
 import axios from 'axios'
 import Header from '@/components/ui/Header'
+import { useSelector } from 'react-redux'
+import Loader from '@/components/Loader'
 
 const CreateCourse = () => {
     const navigate = useNavigate()
-    const { user } = useUser()
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [success, setSuccess] = useState(false)
     const [generatedCourse, setGeneratedCourse] = useState(null)
+    const {currentUser} = useSelector(state => state.user)
 
     const [formData, setFormData] = useState({
         category: '',
@@ -31,10 +32,11 @@ const CreateCourse = () => {
     })
 
     useEffect(() => {
-        if (user) {
-            setFormData(prev => ({ ...prev, userId: user.id }))
+        if (currentUser && currentUser._id) {
+            // Set the userId in formData when user data is available
+            setFormData(prev => ({ ...prev, userId: currentUser._id })) 
         }
-    }, [user])
+    }, [currentUser])
 
     const StepperOptions = [
         {
@@ -60,13 +62,34 @@ const CreateCourse = () => {
             setLoading(true)
             setError('')
             
+            // Validate all required fields are present
+            const requiredFields = ['topic', 'level', 'learningGoal', 'estimatedDuration', 'category'];
+            const missingFields = [];
+            
+            requiredFields.forEach(field => {
+                if (!formData[field]) {
+                    missingFields.push(field);
+                }
+            });
+            
+            // Check if userId is available
+            if (!formData.userId) {
+                missingFields.push('userId');
+            }
+            
+            if (missingFields.length > 0) {
+                setError(`Missing required fields: ${missingFields.join(', ')}`);
+                setLoading(false);
+                return;
+            }
+            
             const response = await axios.post('http://localhost:3000/api/content/generate-course', {
                 topic: formData.topic,
                 level: formData.level,
                 learningGoal: formData.learningGoal,
                 estimatedDuration: parseInt(formData.estimatedDuration),
                 category: formData.category,
-                userId: formData.userId,
+                userId: formData.userId, // Use the userId from formData instead of directly from user object
                 description: formData.description || `A course about ${formData.topic}`,
                 chapterCount: parseInt(formData.chapterCount || '5') // Default to 5 chapters if not specified
             })
@@ -78,7 +101,14 @@ const CreateCourse = () => {
             }, 3000)
         } catch (err) {
             console.error('Error generating course:', err)
-            setError('Failed to generate course. Please try again.')
+            // Check if the error response contains specific missing fields
+            if (err.response && err.response.data && err.response.data.requiredFields) {
+                 setError(`Missing required fields: ${err.response.data.requiredFields.join(', ')}`);
+            } else if (err.response && err.response.data && err.response.data.message) {
+                 setError(`Error: ${err.response.data.message}`); // Display general backend error message
+            } else {
+                 setError('Failed to generate course. Please check your connection and try again.');
+            }
         } finally {
             setLoading(false)
         }
@@ -95,10 +125,10 @@ const CreateCourse = () => {
                 StepperOptions.map((item, index)=>(
                     <div key={index} className='flex items-center'>
                         <div className='flex flex-col items-center w-[50px] md:w-[100px]'>
-                        <div className={`bg-gray-200 p-3 rounded-full text-white ${activeIndex >= index && 'bg-black'}`}>{item.icon}</div>
-                        <h2 className='hidden md:block md:text-sm'>{item.name}</h2>
+                        <div className={`p-3 rounded-full transition-all duration-300 ease-in-out transform ${activeIndex >= index ? 'bg-[#4338ca] text-white scale-110' : 'bg-gray-200 text-gray-500'}`}>{item.icon}</div>
+                        <h2 className={`hidden md:block md:text-sm mt-2 transition-colors duration-300 ease-in-out ${activeIndex >= index ? 'text-black font-medium' : 'text-gray-500'}`}>{item.name}</h2>
                         </div>
-                        {index != StepperOptions?.length - 1 &&<div className={`h-1 w-[50px] md:w-[100px] rounded-full lg:w-[170px] bg-gray-100 ${activeIndex - 1 >= index && 'bg-black'}`}></div>}
+                        {index != StepperOptions?.length - 1 &&<div className={`h-1 w-[50px] md:w-[100px] rounded-full lg:w-[170px] transition-all duration-500 ease-in-out ${activeIndex > index ? 'bg-[#4338ca]' : 'bg-gray-100'}`}></div>}
                     </div>
                 ))
             }
@@ -108,10 +138,7 @@ const CreateCourse = () => {
       <div className='px-10 md:px-10 mt-10'>
         {/* Loading and Error States */}
         {loading && (
-          <div className="text-center py-10">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-lg">Generating your course with AI...</p>
-          </div>
+          <Loader />
         )}
 
         {error && (

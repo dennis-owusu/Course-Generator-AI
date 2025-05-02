@@ -3,7 +3,6 @@ import { HiOutlineSquare3Stack3D } from "react-icons/hi2";
 import { HiOutlineLogout } from "react-icons/hi";
 import { IoShieldCheckmarkOutline } from "react-icons/io5";
 import Header from "@/components/ui/Header";
-import { useUser } from "@clerk/clerk-react";
 import DashboardHome from "./DashboardHome";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -14,10 +13,6 @@ const Dashboard = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [tab, setTab] = useState("");
-
-  const user = useUser();
-  console.log(user?.user?.fullName);
-  console.log(user);
 
   // Set the active tab from the URL query parameters
   useEffect(() => {

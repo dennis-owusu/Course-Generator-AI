@@ -1,0 +1,62 @@
+/* TopicDescription Component Styles */
+.form-group {
+    animation: slideIn 0.4s ease-out;
+  }
+  
+  .form-group label {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    transition: all 0.3s ease;
+  }
+  
+  .form-group input:focus,
+  .form-group textarea:focus {
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  }
+  
+  .form-group input::placeholder,
+  .form-group textarea::placeholder {
+    color: #9ca3af;
+    font-style: italic;
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .max-w-3xl {
+      max-width: 100%;
+    }
+    
+    .px-4 {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    
+    .p-8 {
+      padding: 1.5rem;
+    }
+    
+    .px-8 {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    
+    .py-3 {
+      padding-top: 0.75rem;
+      padding-bottom: 0.75rem;
+    }
+  }
