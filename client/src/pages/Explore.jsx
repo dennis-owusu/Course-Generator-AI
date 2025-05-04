@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Button } from '../components/ui/button'
 import CourseCard from '../components/CourseCard'
 import axios from 'axios'
+import { useSelector } from 'react-redux'
 
 const Explore = () => {
   const [courses, setCourses] = useState([])
@@ -9,6 +10,21 @@ const Explore = () => {
   const [error, setError] = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
+  const [filters, setFilters] = useState({
+    level: '',
+    learningGoal: '',
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
+    page: 1,
+    limit: 12
+  })
+  const [pagination, setPagination] = useState({
+    total: 0,
+    page: 1,
+    limit: 12,
+    totalPages: 0
+  })
+  const { currentUser } = useSelector(state => state.user)
 
   const categories = [
     { id: 'all', name: 'All Courses' },
@@ -25,9 +41,28 @@ const Explore = () => {
     const fetchCourses = async () => {
       try {
         setLoading(true)
-        // In a real app, you would filter by category in the API call
-        const response = await axios.get('http://localhost:3000/api/content/courses')
-        setCourses(response.data)
+        
+        // Build query parameters
+        const params = new URLSearchParams()
+        
+        // Add filters
+        if (activeCategory !== 'all') params.append('category', activeCategory)
+        if (filters.level) params.append('level', filters.level)
+        if (filters.learningGoal) params.append('learningGoal', filters.learningGoal)
+        if (searchTerm) params.append('search', searchTerm)
+        
+        // Add pagination and sorting
+        params.append('page', filters.page)
+        params.append('limit', filters.limit)
+        params.append('sortBy', filters.sortBy)
+        params.append('sortOrder', filters.sortOrder)
+        
+        // Exclude current user's courses if logged in
+        if (currentUser?._id) params.append('excludeUserId', currentUser._id)
+        
+        const response = await axios.get(`http://localhost:3000/api/content/community-courses?${params}`)
+        setCourses(response.data.courses)
+        setPagination(response.data.pagination)
       } catch (err) {
         console.error('Error fetching courses:', err)
         setError('Failed to load courses. Please try again later.')
@@ -37,15 +72,23 @@ const Explore = () => {
     }
 
     fetchCourses()
-  }, [])
+  }, [activeCategory, searchTerm, filters, currentUser])
 
-  // Filter courses based on active category and search term
-  const filteredCourses = courses.filter(course => {
-    const matchesCategory = activeCategory === 'all' || course.category === activeCategory
-    const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         course.description.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesCategory && matchesSearch
-  })
+  // Handle filter changes
+  const handleFilterChange = (filterName, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [filterName]: value,
+      // Reset to page 1 when changing filters
+      page: filterName !== 'page' ? 1 : value
+    }))
+  }
+  
+  // Handle page change
+  const handlePageChange = (newPage) => {
+    if (newPage < 1 || newPage > pagination.totalPages) return
+    handleFilterChange('page', newPage)
+  }
 
   return (
     <div className="mx-4 sm:mx-6 lg:mx-10 my-8">
@@ -94,6 +137,68 @@ const Explore = () => {
           ))}
         </div>
       </div>
+      
+      {/* Advanced Filters */}
+      <div className="mb-8 bg-white p-4 rounded-xl shadow-sm border border-indigo-100">
+        <div className="flex flex-wrap gap-4">
+          {/* Level Filter */}
+          <div className="w-full sm:w-auto">
+            <label className="block text-sm font-medium text-indigo-700 mb-1">Difficulty Level</label>
+            <select
+              value={filters.level}
+              onChange={(e) => handleFilterChange('level', e.target.value)}
+              className="w-full px-3 py-2 border border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="">All Levels</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </div>
+          
+          {/* Learning Goal Filter */}
+          <div className="w-full sm:w-auto">
+            <label className="block text-sm font-medium text-indigo-700 mb-1">Learning Goal</label>
+            <select
+              value={filters.learningGoal}
+              onChange={(e) => handleFilterChange('learningGoal', e.target.value)}
+              className="w-full px-3 py-2 border border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="">All Goals</option>
+              <option value="Career">Career</option>
+              <option value="Academic">Academic</option>
+              <option value="Personal">Personal</option>
+            </select>
+          </div>
+          
+          {/* Sort By Filter */}
+          <div className="w-full sm:w-auto">
+            <label className="block text-sm font-medium text-indigo-700 mb-1">Sort By</label>
+            <select
+              value={filters.sortBy}
+              onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+              className="w-full px-3 py-2 border border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="createdAt">Date Created</option>
+              <option value="title">Title</option>
+              <option value="estimatedDuration">Duration</option>
+            </select>
+          </div>
+          
+          {/* Sort Order */}
+          <div className="w-full sm:w-auto">
+            <label className="block text-sm font-medium text-indigo-700 mb-1">Order</label>
+            <select
+              value={filters.sortOrder}
+              onChange={(e) => handleFilterChange('sortOrder', e.target.value)}
+              className="w-full px-3 py-2 border border-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="desc">Descending</option>
+              <option value="asc">Ascending</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
       {/* Error Message */}
       {error && (
@@ -107,14 +212,43 @@ const Explore = () => {
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
         </div>
-      ) : filteredCourses.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCourses.map(course => (
-            <div key={course._id} className="transform transition-all duration-300 hover:-translate-y-1 animate-fade-in">
-              <CourseCard course={course} />
+      ) : courses.length > 0 ? (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {courses.map(course => (
+              <div key={course._id} className="transform transition-all duration-300 hover:-translate-y-1 animate-fade-in">
+                <CourseCard course={course} />
+              </div>
+            ))}
+          </div>
+          
+          {/* Pagination */}
+          {pagination.totalPages > 1 && (
+            <div className="flex justify-center mt-8">
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => handlePageChange(pagination.page - 1)}
+                  disabled={pagination.page === 1}
+                  className={`px-4 py-2 rounded-lg ${pagination.page === 1 ? 'bg-indigo-100 text-indigo-400 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
+                >
+                  Previous
+                </button>
+                
+                <div className="flex items-center px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg">
+                  Page {pagination.page} of {pagination.totalPages}
+                </div>
+                
+                <button
+                  onClick={() => handlePageChange(pagination.page + 1)}
+                  disabled={pagination.page === pagination.totalPages}
+                  className={`px-4 py-2 rounded-lg ${pagination.page === pagination.totalPages ? 'bg-indigo-100 text-indigo-400 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
+                >
+                  Next
+                </button>
+              </div>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       ) : (
         <div className="text-center py-16 bg-white rounded-2xl shadow-lg border border-indigo-100 animate-slide-in">
           <h3 className="text-2xl font-semibold text-indigo-900 mb-3">No Courses Found</h3>

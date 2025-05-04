@@ -5,7 +5,7 @@ import { generateWithGitHubAI } from '../utils/githubAI.js';
 
 // Ensure environment variables are loaded
 dotenv.config();
-
+ 
 // Helper function to search for YouTube videos with improved relevance and error handling
 async function searchYouTubeVideos(query, maxResults = 3, relevanceThreshold = 0.6) {
     try {
@@ -770,6 +770,79 @@ export const getCourseById = async (req, res, next) => {
         }
         res.status(200).json(course);
     } catch (error) {
+        next(error);
+    }
+};
+
+// Get community courses with filtering and pagination
+export const getCommunityCoursesWithFilters = async (req, res, next) => {
+    try {
+        const { 
+            page = 1, 
+            limit = 10, 
+            level, 
+            category, 
+            learningGoal,
+            sortBy = 'createdAt',
+            sortOrder = 'desc',
+            search,
+            excludeUserId
+        } = req.query;
+        
+        // Build filter object
+        const filter = { isPublic: true };
+        
+        // Add optional filters if provided
+        if (level) filter.level = level;
+        if (category) filter.category = category;
+        if (learningGoal) filter.learningGoal = learningGoal;
+        
+        // Exclude user's own courses if requested
+        if (excludeUserId) filter.createdBy = { $ne: excludeUserId };
+        
+        // Add search functionality
+        if (search) {
+            filter.$or = [
+                { title: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } }
+            ];
+        }
+        
+        // Calculate pagination
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+        
+        // Determine sort direction
+        const sortDirection = sortOrder === 'asc' ? 1 : -1;
+        
+        // Create sort object
+        const sort = {};
+        sort[sortBy] = sortDirection;
+        
+        // Execute query with pagination and populate creator information
+        const courses = await Content.find(filter)
+            .sort(sort)
+            .skip(skip)
+            .limit(parseInt(limit))
+            .populate('createdBy', 'username profilePicture')
+            .lean();
+            
+        // Get total count for pagination
+        const totalCourses = await Content.countDocuments(filter);
+        
+        // Calculate total pages
+        const totalPages = Math.ceil(totalCourses / parseInt(limit));
+        
+        res.status(200).json({
+            courses,
+            pagination: {
+                total: totalCourses,
+                page: parseInt(page),
+                limit: parseInt(limit),
+                totalPages
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching community courses:', error);
         next(error);
     }
 };

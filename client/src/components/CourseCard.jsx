@@ -1,6 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from './ui/button'
+import { FaUser } from 'react-icons/fa'
 
 const CourseCard = ({ course }) => {
   const navigate = useNavigate()
@@ -31,6 +32,28 @@ const CourseCard = ({ course }) => {
           <span>{course.modules?.length || 0} chapters</span>
           <span>{course.estimatedDuration} hours</span>
         </div>
+        
+        {/* Creator information - shown for community courses */}
+        {course.createdBy && (
+          <div className="mt-3 flex items-center text-xs text-gray-600">
+            <div className="bg-indigo-100 p-1 rounded-full mr-2">
+              {typeof course.createdBy === 'object' && course.createdBy.profilePicture ? (
+                <img 
+                  src={course.createdBy.profilePicture} 
+                  alt="Creator" 
+                  className="w-4 h-4 rounded-full"
+                />
+              ) : (
+                <FaUser className="text-indigo-600" />
+              )}
+            </div>
+            <span>
+              Created by {typeof course.createdBy === 'object' ? 
+                (course.createdBy.username || 'Anonymous') : 
+                'Anonymous'}
+            </span>
+          </div>
+        )}
         
         <div className="mt-4 flex justify-end">
           <Button

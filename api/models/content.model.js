@@ -83,8 +83,31 @@ const contentSchema = new Schema({
         required: false
     },
     createdBy: {
-        type: String, // Clerk user ID
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true
+    },
+    // Community and engagement metrics
+    isPublic: {
+        type: Boolean,
+        default: true
+    },
+    learners: {
+        type: Number,
+        default: 0
+    },
+    ratings: [{
+        userId: String,
+        rating: Number, // 1-5 stars
+        review: String,
+        createdAt: {
+            type: Date,
+            default: Date.now
+        }
+    }],
+    averageRating: {
+        type: Number,
+        default: 0
     },
     createdAt: {
         type: Date,
