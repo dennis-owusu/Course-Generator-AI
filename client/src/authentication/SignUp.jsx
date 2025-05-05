@@ -39,7 +39,7 @@ const SignUp = () => {
       }
       setLoading(false);
       setError(null);
-      navigate('/sign-in'); // Navigate to sign-in page after successful signup
+      navigate('/signin'); // Navigate to sign-in page after successful signup
     } catch (error) {
       setLoading(false);
       setError(error.message);

@@ -39,7 +39,7 @@ const SignIn = () => {
         return;
       }
       dispatch(signInSuccess(data));
-      navigate('/'); // Navigate to home or dashboard after successful signin
+      navigate('/dashboard?tab=home'); // Navigate to home or dashboard after successful signin
     } catch (error) {
       dispatch(signInFailure(error.message));
     }
