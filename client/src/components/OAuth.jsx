@@ -53,10 +53,11 @@ const OAuth = () => {
     <div className="flex justify-center">
       <button
         onClick={handleGoogleClick}
-        className="p-2 border flex items-center justify-center gap-2 rounded-lg w-full hover:bg-gray-50"
+        className="p-3 border border-gray-300 flex items-center justify-center gap-3 rounded-lg w-full hover:bg-gray-50 transition-colors shadow-sm focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
+        disabled={loading}
       >
         <FcGoogle className="w-6 h-6" />
-        <span>{loading ? <p>Loading...</p> : <p>Continue with Google</p>}</span>
+        <span className="font-medium text-gray-700">{loading ? 'Processing...' : 'Continue with Google'}</span>
       </button>
 
       {showSuccessModal && (

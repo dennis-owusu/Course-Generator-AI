@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import OAuth from '@/components/OAuth';
+import { FiUser, FiMail, FiLock } from 'react-icons/fi';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({});
@@ -46,50 +47,97 @@ const SignUp = () => {
   };
 
   return (
-    <div className='p-3 max-w-lg mx-auto min-h-screen flex flex-col justify-center'>
-      <h1 className='text-3xl text-center font-semibold my-7'>Sign Up</h1>
-      <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
-        <Input
-          type='text'
-          placeholder='Username'
-          className='border p-3 rounded-lg'
-          id='username'
-          onChange={handleChange}
-          required
-        />
-        <Input
-          type='email'
-          placeholder='Email'
-          className='border p-3 rounded-lg'
-          id='email'
-          onChange={handleChange}
-          required
-        />
-        <Input
-          type='password'
-          placeholder='Password'
-          className='border p-3 rounded-lg'
-          id='password'
-          onChange={handleChange}
-          required
-        />
+    <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-white p-4'>
+      <div className='w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden'>
+        <div className='bg-indigo-600 p-6 text-center'>
+          <img src='/logo.png' alt='Logo' className='h-12 mx-auto mb-2' />
+          <h1 className='text-3xl font-bold text-white'>Create Account</h1>
+          <p className='text-indigo-200 mt-1'>Join our learning community today</p>
+        </div>
+        
+        <div className='p-6'>
+          <form onSubmit={handleSubmit} className='space-y-4'>
+            <div className='relative'>
+              <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
+                <FiUser className='text-gray-400' />
+              </div>
+              <Input
+                type='text'
+                placeholder='Username'
+                className='pl-10 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent'
+                id='username'
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <div className='relative'>
+              <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
+                <FiMail className='text-gray-400' />
+              </div>
+              <Input
+                type='email'
+                placeholder='Email'
+                className='pl-10 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent'
+                id='email'
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <div className='relative'>
+              <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
+                <FiLock className='text-gray-400' />
+              </div>
+              <Input
+                type='password'
+                placeholder='Password'
+                className='pl-10 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent'
+                id='password'
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-        <Button
-          disabled={loading}
-          type='submit'
-          className='bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80'
-        >
-          {loading ? 'Loading...' : 'Sign Up'}
-        </Button>
-      </form>
-        <OAuth/>
-      <div className='flex justify-between gap-2 mt-5'>
-        <p>Have an account?</p>
-        <Link type='submit'>
-          <span className='text-blue-700'>Sign in</span>
-        </Link>
+            <Button
+              disabled={loading}
+              type='submit'
+              className='w-full bg-indigo-600 text-white p-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-70'
+            >
+              {loading ? 'Creating Account...' : 'Sign Up'}
+            </Button>
+          </form>
+          
+          <div className='mt-6'>
+            <div className='relative'>
+              <div className='absolute inset-0 flex items-center'>
+                <div className='w-full border-t border-gray-300'></div>
+              </div>
+              <div className='relative flex justify-center text-sm'>
+                <span className='px-2 bg-white text-gray-500'>Or continue with</span>
+              </div>
+            </div>
+            
+            <div className='mt-6'>
+              <OAuth/>
+            </div>
+          </div>
+          
+          <div className='mt-6 text-center'>
+            <p className='text-gray-600'>Already have an account? 
+              <Link to='/signin' className='text-indigo-600 font-medium hover:text-indigo-500 ml-1'>
+                Sign in
+              </Link>
+            </p>
+          </div>
+          
+          {error && (
+            <div className='mt-4 bg-red-50 text-red-600 p-3 rounded-lg text-sm'>
+              {error}
+            </div>
+          )}
+        </div>
       </div>
-      {error && <p className='text-red-500 mt-5'>{error}</p>}
     </div>
   );
 };

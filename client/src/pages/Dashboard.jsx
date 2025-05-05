@@ -6,20 +6,49 @@ import Header from "@/components/ui/Header";
 import DashboardHome from "./DashboardHome";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { signOutSuccess } from "../redux/user/userSlice";
 import Explore from "./Explore";
 import Upgrade from "./Upgrade";
 
 const Dashboard = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [tab, setTab] = useState("");
 
   // Set the active tab from the URL query parameters
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const tabFromUrl = urlParams.get("tab");
+    
+    // Handle logout action when the tab is set to logout
+    if (tabFromUrl === "logout") {
+      handleLogout();
+      return;
+    }
+    
     setTab(tabFromUrl || "home"); // Default to "home" if no tab is present
   }, [location.search]);
+  
+  // Function to handle logout
+  const handleLogout = async () => {
+    try {
+      // Call the backend logout endpoint if needed
+      await fetch('/api/auth/signout', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      
+      // Clear user from Redux store
+      dispatch(signOutSuccess());
+      
+      // Redirect to home page
+      navigate('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   const items = [
     {
@@ -54,7 +83,7 @@ const Dashboard = () => {
           {items.map((item, index) => (
             <div
               key={index}
-              onClick={() => navigate(`/dashboard?tab=${item.url}`)}
+              onClick={() => item.url === "logout" ? handleLogout() : navigate(`/dashboard?tab=${item.url}`)}
               className={`flex mt-1 ml-3 items-center gap-2 p-2 w-48 rounded-md cursor-pointer hover:bg-gray-100 ${
                 tab === item.url ? "bg-gray-100" : ""
               }`}
