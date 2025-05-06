@@ -52,18 +52,18 @@ const Upgrade = () => {
   ]
 
   return (
-    <div className="mx-4 sm:mx-6 lg:mx-10 my-8">
+    <div className="px-3 sm:mx-6 lg:mx-10 my-4 sm:my-8">
       {/* Header Section */}
-      <div className="text-center mb-12 animate-fade-in">
-        <h2 className="text-3xl font-bold text-indigo-900 mb-4">Upgrade Your Learning Experience</h2>
-        <p className="text-indigo-700 max-w-2xl mx-auto">
+      <div className="text-center mb-8 sm:mb-12 animate-fade-in">
+        <h2 className="text-2xl sm:text-3xl font-bold text-indigo-900 mb-3 sm:mb-4">Upgrade Your Learning Experience</h2>
+        <p className="text-sm sm:text-base text-indigo-700 max-w-2xl mx-auto px-2 sm:px-0">
           Unlock premium features to enhance your learning journey with advanced AI-generated courses, 
           custom assessments, and more.
         </p>
       </div>
 
       {/* Pricing Plans */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-10 sm:mb-16">
         {plans.map((plan, index) => (
           <div 
             key={index} 
@@ -71,20 +71,20 @@ const Upgrade = () => {
               ? 'border-indigo-500 transform scale-105 shadow-xl' 
               : 'border-indigo-100 hover:shadow-xl hover:-translate-y-1'}`}
           >
-            <div className={`p-6 ${plan.highlighted ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-900'}`}>
-              <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
+            <div className={`p-4 sm:p-6 ${plan.highlighted ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-900'}`}>
+              <h3 className="text-lg sm:text-xl font-bold mb-1">{plan.name}</h3>
               <div className="flex items-end">
-                <span className="text-3xl font-bold">{plan.price}</span>
-                {plan.period && <span className="ml-1 text-sm opacity-80">{plan.period}</span>}
+                <span className="text-2xl sm:text-3xl font-bold">{plan.price}</span>
+                {plan.period && <span className="ml-1 text-xs sm:text-sm opacity-80">{plan.period}</span>}
               </div>
             </div>
 
-            <div className="p-6">
-              <ul className="space-y-3 mb-8">
+            <div className="p-4 sm:p-6">
+              <ul className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
                 {plan.features.map((feature, i) => (
                   <li key={i} className="flex items-start">
                     <svg 
-                      className="h-5 w-5 text-indigo-500 mr-2 mt-0.5" 
+                      className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-500 mr-2 mt-0.5" 
                       fill="none" 
                       stroke="currentColor" 
                       viewBox="0 0 24 24" 
@@ -97,14 +97,14 @@ const Upgrade = () => {
                         d="M5 13l4 4L19 7"
                       ></path>
                     </svg>
-                    <span className="text-gray-700">{feature}</span>
+                    <span className="text-xs sm:text-sm text-gray-700">{feature}</span>
                   </li>
                 ))}
               </ul>
 
               <Button
                 disabled={plan.disabled}
-                className={`w-full py-3 ${plan.highlighted 
+                className={`w-full py-2 sm:py-3 text-xs sm:text-sm ${plan.highlighted 
                   ? 'bg-indigo-600 hover:bg-indigo-700 text-white' 
                   : plan.disabled 
                     ? 'bg-gray-100 text-gray-500' 
@@ -118,10 +118,10 @@ const Upgrade = () => {
       </div>
 
       {/* Features Showcase */}
-      <div className="bg-white rounded-2xl p-8 shadow-lg border border-indigo-100 mb-12">
-        <h3 className="text-2xl font-bold text-indigo-900 mb-8 text-center">Premium Features</h3>
+      <div className="bg-white rounded-2xl p-4 sm:p-8 shadow-lg border border-indigo-100 mb-8 sm:mb-12">
+        <h3 className="text-xl sm:text-2xl font-bold text-indigo-900 mb-6 sm:mb-8 text-center">Premium Features</h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {[
             {
               title: 'Advanced AI Course Generation',
@@ -154,20 +154,20 @@ const Upgrade = () => {
               icon: '🛎️'
             }
           ].map((feature, index) => (
-            <div key={index} className="flex flex-col items-center text-center p-4 rounded-xl hover:bg-indigo-50 transition-all">
-              <span className="text-4xl mb-4">{feature.icon}</span>
-              <h4 className="text-lg font-semibold text-indigo-900 mb-2">{feature.title}</h4>
-              <p className="text-gray-700">{feature.description}</p>
+            <div key={index} className="flex flex-col items-center text-center p-3 sm:p-4 rounded-xl hover:bg-indigo-50 transition-all">
+              <span className="text-3xl sm:text-4xl mb-3 sm:mb-4">{feature.icon}</span>
+              <h4 className="text-base sm:text-lg font-semibold text-indigo-900 mb-1 sm:mb-2">{feature.title}</h4>
+              <p className="text-xs sm:text-sm text-gray-700">{feature.description}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* FAQ Section */}
-      <div className="bg-white rounded-2xl p-8 shadow-lg border border-indigo-100">
-        <h3 className="text-2xl font-bold text-indigo-900 mb-8 text-center">Frequently Asked Questions</h3>
+      <div className="bg-white rounded-2xl p-4 sm:p-8 shadow-lg border border-indigo-100">
+        <h3 className="text-xl sm:text-2xl font-bold text-indigo-900 mb-6 sm:mb-8 text-center">Frequently Asked Questions</h3>
         
-        <div className="space-y-6 max-w-3xl mx-auto">
+        <div className="space-y-4 sm:space-y-6 max-w-3xl mx-auto">
           {[
             {
               question: 'How do I upgrade my account?',
@@ -186,9 +186,9 @@ const Upgrade = () => {
               answer: 'We accept all major credit cards, PayPal, and bank transfers for Enterprise plans.'
             }
           ].map((faq, index) => (
-            <div key={index} className="border-b border-indigo-100 pb-4">
-              <h4 className="text-lg font-semibold text-indigo-900 mb-2">{faq.question}</h4>
-              <p className="text-gray-700">{faq.answer}</p>
+            <div key={index} className="border-b border-indigo-100 pb-3 sm:pb-4">
+              <h4 className="text-base sm:text-lg font-semibold text-indigo-900 mb-1 sm:mb-2">{faq.question}</h4>
+              <p className="text-xs sm:text-sm text-gray-700">{faq.answer}</p>
             </div>
           ))}
         </div>
