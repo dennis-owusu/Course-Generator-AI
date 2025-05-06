@@ -126,6 +126,18 @@ export const generateCourse = async (req, res, next) => {
         
         console.log(`Generating ${level} level course on "${topic}" for ${learningGoal} purposes...`);
         
+        // Check for required API keys
+        const missingKeys = [];
+        if (!process.env.GPT40_API_KEY) {
+            console.warn('GPT40_API_KEY is not set in environment variables. Will use fallback content generation.');
+            missingKeys.push('GPT40_API_KEY');
+        }
+        
+        if (!process.env.YOUTUBE_API_KEY) {
+            console.warn('YOUTUBE_API_KEY is not set in environment variables. YouTube video enrichment will be skipped.');
+            missingKeys.push('YOUTUBE_API_KEY');
+        }
+        
         // Generate a more comprehensive course structure based on difficulty level
         const courseStructure = generateCourseStructure(topic, level, learningGoal, estimatedDuration, category, userId);
         
@@ -151,7 +163,8 @@ export const generateCourse = async (req, res, next) => {
         
         console.log(`Course generated successfully: ${totalModules} modules, ${totalLessons} lessons, ${totalVideos} videos`);
         
-        res.status(200).json({
+        // Prepare response with warning about missing API keys if applicable
+        const response = {
             success: true,
             message: 'Course generated successfully',
             stats: {
@@ -160,7 +173,18 @@ export const generateCourse = async (req, res, next) => {
                 videos: totalVideos
             },
             course: newContent
-        });
+        };
+        
+        if (missingKeys.length > 0) {
+            response.warnings = {
+                message: 'Course generated with limited features due to missing API keys',
+                missingKeys: missingKeys,
+                impact: missingKeys.includes('GPT40_API_KEY') ? 'Using fallback content instead of AI-generated notes' : ''
+                    + (missingKeys.includes('YOUTUBE_API_KEY') ? 'YouTube video recommendations may be limited or missing' : '')
+            };
+        }
+        
+        res.status(200).json(response);
     } catch (error) {
         console.error('Error generating course:', error);
         
@@ -177,6 +201,16 @@ export const generateCourse = async (req, res, next) => {
             return res.status(409).json({
                 success: false,
                 message: 'A course with similar properties already exists'
+            });
+        }
+        
+        // Handle API-related errors more gracefully
+        if (error.message && (error.message.includes('API') || error.message.includes('network'))) {
+            return res.status(503).json({
+                success: false,
+                message: 'Service temporarily unavailable',
+                details: 'There was an issue connecting to one of our external services. Please try again later.',
+                error: error.message
             });
         }
         
@@ -477,9 +511,15 @@ function generateQuizQuestions(topic, lessonTitle, count) {
 
 // Helper function to validate YouTube API key
 // Function to generate lesson notes using GitHub's GPT-40 API
-// Generate lesson notes locally without relying on external APIs
+// Falls back to local content generation if API is unavailable
 async function generateLessonNotes(topic, lessonTitle, level) {
     try {
+        // First check if GitHub AI token is available
+        if (!validateGitHubAIToken()) {
+            console.log(`Using local content generation for lesson: ${lessonTitle} (API key not available)`);
+            return generateLocalContent(topic, lessonTitle, level);
+        }
+        
         console.log(`Generating AI content for lesson: ${lessonTitle}`);
         
         // Create a detailed prompt for the GitHub AI model
@@ -500,20 +540,28 @@ async function generateLessonNotes(topic, lessonTitle, level) {
             Ensure the content is accurate, educational, and engaging for ${level.toLowerCase()} level students.
         `;
         
-        // Generate content using GitHub's AI model
-        const aiContent = await generateWithGitHubAI(prompt);
+        // Set a timeout for the API call to prevent long-running requests
+        const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('AI content generation timed out')), 15000);
+        });
+        
+        // Generate content using GitHub's AI model with timeout
+        const aiContent = await Promise.race([
+            generateWithGitHubAI(prompt),
+            timeoutPromise
+        ]);
         
         // If AI generation fails, fall back to local content generation
         if (!aiContent) {
-            console.log(`Falling back to local content generation for lesson: ${lessonTitle}`);
+            console.log(`Falling back to local content generation for lesson: ${lessonTitle} (No content returned)`);
             return generateLocalContent(topic, lessonTitle, level);
         }
         
         return aiContent;
     } catch (error) {
-        console.error('Error generating lesson notes with AI:', error.message);
+        console.warn('Error generating lesson notes with AI:', error.message);
         // Fall back to local content generation
-        console.log(`Falling back to local content generation for lesson: ${lessonTitle}`);
+        console.log(`Falling back to local content generation for lesson: ${lessonTitle} (Error: ${error.message})`);
         return generateLocalContent(topic, lessonTitle, level);
     }
 }
@@ -617,6 +665,22 @@ async function enrichCourseWithNotes(courseStructure, topic) {
     try {
         console.log('Starting to generate AI notes for lessons...');
         
+        // Check if GitHub AI token is available
+        const hasGitHubAIToken = !!process.env.GPT40_API_KEY;
+        if (!hasGitHubAIToken) {
+            console.warn('GPT40_API_KEY is not set. Using fallback content generation for all lessons.');
+            // Add a note to each lesson about using fallback content
+            for (const module of courseStructure.modules) {
+                for (const lesson of module.lessons) {
+                    // Generate fallback content directly
+                    lesson.aiNotes = generateLocalContent(topic, lesson.title, courseStructure.level);
+                    lesson.contentNote = "This content was generated using our built-in system. For enhanced AI-generated content, please check your environment settings.";
+                }
+            }
+            console.log('Fallback content generation completed for all lessons.');
+            return;
+        }
+        
         // Track success rate for note generation
         let totalLessons = 0;
         let successfulGenerations = 0;
@@ -633,10 +697,16 @@ async function enrichCourseWithNotes(courseStructure, topic) {
                         // Add the AI-generated notes to the lesson
                         lesson.aiNotes = notes;
                         successfulGenerations++;
+                    } else {
+                        // If AI generation failed, use fallback content
+                        lesson.aiNotes = generateLocalContent(topic, lesson.title, courseStructure.level);
+                        lesson.contentNote = "This content was generated using our built-in system due to an issue with the AI service.";
                     }
                 } catch (lessonError) {
-                    console.error(`Error generating notes for lesson "${lesson.title}" with GPT-4o:`, lessonError.message);
-                    // Continue with next lesson
+                    console.warn(`Error generating notes for lesson "${lesson.title}" with GPT-4o:`, lessonError.message);
+                    // Use fallback content for this lesson
+                    lesson.aiNotes = generateLocalContent(topic, lesson.title, courseStructure.level);
+                    lesson.contentNote = "This content was generated using our built-in system due to an issue with the AI service.";
                 }
             }
         }
@@ -646,11 +716,20 @@ async function enrichCourseWithNotes(courseStructure, topic) {
         console.log(`AI notes generation completed: ${successfulGenerations}/${totalLessons} notes generated (${successRate.toFixed(1)}%)`);
         
     } catch (error) {
-        console.error('Error enriching course with AI notes:', error.message);
-        // Continue without notes if there's an error
+        console.warn('Error enriching course with AI notes:', error.message);
+        console.log('Falling back to local content generation for all lessons');
+        
+        // Fallback: Generate local content for all lessons
+        for (const module of courseStructure.modules) {
+            for (const lesson of module.lessons) {
+                lesson.aiNotes = generateLocalContent(topic, lesson.title, courseStructure.level);
+                lesson.contentNote = "This content was generated using our built-in system due to a technical issue.";
+            }
+        }
     }
 }
 
+// Helper function to validate YouTube API key
 async function validateYouTubeApiKey() {
     if (!process.env.YOUTUBE_API_KEY) {
         console.warn('YouTube API key is not set in environment variables');
@@ -670,12 +749,21 @@ async function validateYouTubeApiKey() {
         return true;
     } catch (error) {
         if (error.response && error.response.status === 403) {
-            console.error('YouTube API key validation failed: Invalid key or quota exceeded');
+            console.warn('YouTube API key validation failed: Invalid key or quota exceeded');
         } else {
-            console.error('YouTube API key validation failed:', error.message);
+            console.warn('YouTube API key validation failed:', error.message);
         }
         return false;
     }
+}
+
+// Helper function to validate GitHub AI token
+function validateGitHubAIToken() {
+    if (!process.env.GPT40_API_KEY) {
+        console.warn('GitHub AI token (GPT40_API_KEY) is not set in environment variables');
+        return false;
+    }
+    return true;
 }
 
 // Helper function to enrich course with relevant YouTube videos
@@ -683,7 +771,13 @@ async function enrichCourseWithVideos(courseStructure, topic) {
     // Validate YouTube API key before making any requests
     const isApiKeyValid = await validateYouTubeApiKey();
     if (!isApiKeyValid) {
-        console.warn('Skipping YouTube video enrichment due to invalid API key');
+        console.warn('Skipping YouTube video enrichment due to invalid or missing API key');
+        // Add a note to each lesson about missing videos
+        for (const module of courseStructure.modules) {
+            for (const lesson of module.lessons) {
+                lesson.videoNote = "YouTube video recommendations are not available. Please check the course settings or try again later.";
+            }
+        }
         return;
     }
     
@@ -789,8 +883,8 @@ export const getCommunityCoursesWithFilters = async (req, res, next) => {
             excludeUserId
         } = req.query;
         
-        // Build filter object
-        const filter = { isPublic: true };
+        // Build filter object - removed isPublic filter to show all courses
+        const filter = {};
         
         // Add optional filters if provided
         if (level) filter.level = level;

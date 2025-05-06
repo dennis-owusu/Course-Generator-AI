@@ -11,7 +11,7 @@ export async function generateWithGitHubAI(prompt) {
         const token = process.env.GPT40_API_KEY;
          
         if (!token) {
-            console.error('GitHub token is not set in environment variables');
+            console.warn('GitHub AI token (GPT40_API_KEY) is not set in environment variables. Using fallback content generation.');
             return null;
         }
         
@@ -36,10 +36,11 @@ export async function generateWithGitHubAI(prompt) {
         // Return the generated content
         return response.choices[0].message.content;
     } catch (error) {
-        console.error('Error generating content with GitHub AI:', error.message);
+        console.warn('Error generating content with GitHub AI:', error.message);
         if (error.response) {
-            console.error('API error response:', error.response.data);
+            console.warn('API error response:', error.response.data);
         }
+        console.warn('Falling back to local content generation.');
         return null;
     }
 }
