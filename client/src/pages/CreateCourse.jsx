@@ -8,6 +8,7 @@ import React, { useState, useEffect } from 'react'
 import { HiClipboardDocumentCheck, HiLightBulb, HiMiniSquares2X2 } from 'react-icons/hi2'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { getApiUrl } from '../lib/api-config'
 import Header from '@/components/ui/Header'
 import { useSelector } from 'react-redux'
 import Loader from '@/components/Loader'
@@ -81,7 +82,7 @@ const CreateCourse = () => {
         return
       }
       
-      const response = await axios.post('http://localhost:3000/api/content/generate-course', {
+      const response = await axios.post(getApiUrl('/api/content/generate-course'), {
         topic: formData.topic,
         level: formData.level,
         learningGoal: formData.learningGoal,

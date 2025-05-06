@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Button } from '../components/ui/button'
 import CourseCard from '../components/CourseCard'
 import axios from 'axios'
+import { getApiUrl } from '../lib/api-config'
 import { useSelector } from 'react-redux'
 
 const Explore = () => {
@@ -60,7 +61,7 @@ const Explore = () => {
         // Exclude current user's courses if logged in
         if (currentUser?._id) params.append('excludeUserId', currentUser._id)
         
-        const response = await axios.get(`http://localhost:3000/api/content/community-courses?${params}`)
+        const response = await axios.get(getApiUrl(`/api/content/community-courses?${params}`))
         setCourses(response.data.courses)
         setPagination(response.data.pagination)
       } catch (err) {

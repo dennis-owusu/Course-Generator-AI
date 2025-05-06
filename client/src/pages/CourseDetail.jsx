@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { getApiUrl } from '../lib/api-config'
 import { marked } from 'marked'
 import Header from '@/components/ui/Header'
 import { Button } from '@/components/ui/button'
@@ -21,7 +22,7 @@ const CourseDetail = () => {
     const fetchCourse = async () => {
       try {
         setLoading(true)
-        const response = await axios.get(`http://localhost:3000/api/content/course/${courseId}`)
+        const response = await axios.get(getApiUrl(`/api/content/course/${courseId}`))
         setCourse(response.data)
         setLoading(false)
       } catch (err) {

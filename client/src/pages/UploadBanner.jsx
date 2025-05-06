@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { getApiUrl } from '../lib/api-config';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/ui/Header';
 import Loader from '@/components/Loader';
@@ -20,7 +21,7 @@ const UploadBanner = () => {
     // Fetch course details to display the title
     const fetchCourse = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/content/course/${courseId}`);
+        const response = await axios.get(getApiUrl(`/api/content/course/${courseId}`));
         setCourseTitle(response.data.title);
       } catch (err) { 
         console.error('Error fetching course details:', err);
@@ -56,7 +57,7 @@ const UploadBanner = () => {
     formData.append('bannerImage', selectedFile);
 
     try {
-      await axios.post(`http://localhost:3000/api/content/course/${courseId}/banner`, formData, {
+      await axios.post(getApiUrl(`/api/content/course/${courseId}/banner`), formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

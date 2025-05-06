@@ -2,6 +2,7 @@ import { Button } from '../components/ui/button'
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { getApiUrl } from '../lib/api-config'
 import CourseCard from '../components/CourseCard'
 import { useSelector } from 'react-redux'
 
@@ -16,7 +17,7 @@ const DashboardHome = () => {
     const fetchUserCourses = async () => {
       try {
         setLoading(true)
-        const response = await axios.get(`http://localhost:3000/api/content/user-courses/${currentUser._id}`)
+        const response = await axios.get(getApiUrl(`/api/content/user-courses/${currentUser._id}`))
         setCourses(response.data)
       } catch (err) {
         console.error('Error fetching courses:', err)

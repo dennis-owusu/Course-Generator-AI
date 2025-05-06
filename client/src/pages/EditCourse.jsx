@@ -9,6 +9,7 @@ import { HiClipboardDocumentCheck, HiLightBulb, HiMiniSquares2X2 } from 'react-i
 import { useNavigate, useParams } from 'react-router-dom'
 // import { useUser } from '@clerk/clerk-react' // Removed Clerk user hook
 import axios from 'axios'
+import { getApiUrl } from '../lib/api-config'
 import Header from '@/components/ui/Header'
 import Loader from '@/components/Loader'
 
@@ -37,7 +38,7 @@ const EditCourse = () => { // Renamed component
             if (!courseId) return;
             setLoading(true);
             try {
-                const response = await axios.get(`http://localhost:3000/api/content/course/${courseId}`);
+                const response = await axios.get(getApiUrl(`/api/content/course/${courseId}`));
                 const courseData = response.data;
                 setFormData({
                     category: courseData.category || '',
@@ -91,7 +92,7 @@ const EditCourse = () => { // Renamed component
             setError('')
             
             // Call the update endpoint instead of create
-            const response = await axios.put(`http://localhost:3000/api/content/course/${courseId}`, {
+            const response = await axios.put(getApiUrl(`/api/content/course/${courseId}`), {
                 title: formData.topic, // Map topic back to title
                 level: formData.level,
                 learningGoal: formData.learningGoal,
