@@ -50,7 +50,7 @@ const moduleSchema = new Schema({
     }
 });
 
-const contentSchema = new Schema({
+const contentSchema = new Schema({ 
     title: {
         type: String,
         required: true

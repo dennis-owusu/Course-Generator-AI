@@ -22,6 +22,9 @@ const CourseDetail = () => {
     const fetchCourse = async () => {
       try {
         setLoading(true)
+        if (!courseId) {
+          throw new Error('Course ID is missing')
+        }
         const response = await axios.get(getApiUrl(`/api/content/course/${courseId}`))
         setCourse(response.data)
         setLoading(false)
@@ -244,33 +247,16 @@ const CourseDetail = () => {
                           dangerouslySetInnerHTML={{ __html: marked.parse(currentLesson.aiNotes) }}
                         ></div>
                       </div>
+                    ) : currentLesson.content ? (
+                      <div className="study-notes-content">
+                        <div 
+                          className="prose prose-indigo max-w-none grouped-content"
+                          dangerouslySetInnerHTML={{ __html: marked.parse(currentLesson.content) }}
+                        ></div>
+                      </div>
                     ) : (
-                      <div className="study-notes-fallback">
-                        <div className="notes-section">
-                          <h4 className="section-title">Lesson Overview</h4>
-                          <p className="section-content">This chapter covers key concepts related to <span className="highlight">{currentLesson.title}</span>.</p>
-                        </div>
-                        <div className="notes-section">
-                          <h4 className="section-title">Key Points</h4>
-                          <ul className="key-points-list">
-                            <li className="key-point">
-                              <span className="point-icon"></span>
-                              <span className="point-text">Understanding the fundamentals of {currentLesson.title}</span>
-                            </li>
-                            <li className="key-point">
-                              <span className="point-icon"></span>
-                              <span className="point-text">Practical applications and examples</span>
-                            </li>
-                            <li className="key-point">
-                              <span className="point-icon"></span>
-                              <span className="point-text">Best practices and implementation strategies</span>
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="notes-section">
-                          <h4 className="section-title">Next Steps</h4>
-                          <p className="section-content italic">Review the lesson content for detailed information on these topics.</p>
-                        </div>
+                      <div className="p-4 bg-gray-50 rounded-lg text-center">
+                        <p className="text-gray-500">No study notes available for this lesson.</p>
                       </div>
                     )}
                   </div>
@@ -304,9 +290,15 @@ const CourseDetail = () => {
                       </summary>
                       <div className="mt-4 px-4 pb-4">
                         <div className="prose prose-slate max-w-none">
-                          {currentLesson.content.split('\n').map((paragraph, i) => (
-                            <p key={i} className="mb-4 text-gray-700 leading-relaxed">{paragraph}</p>
-                          ))}
+                          {currentLesson.aiNotes ? (
+                            <div dangerouslySetInnerHTML={{ __html: marked.parse(currentLesson.aiNotes) }}></div>
+                          ) : currentLesson.content ? (
+                            currentLesson.content.split('\n').map((paragraph, i) => (
+                              <p key={i} className="mb-4 text-gray-700 leading-relaxed">{paragraph}</p>
+                            ))
+                          ) : (
+                            <p className="text-gray-500">No detailed content available for this lesson.</p>
+                          )}
                         </div>
                       </div>
                     </details>

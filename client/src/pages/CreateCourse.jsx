@@ -63,7 +63,7 @@ const CreateCourse = () => {
       setError('')
       
       // Validate all required fields are present
-      const requiredFields = ['topic', 'level', 'learningGoal', 'estimatedDuration', 'category']
+      const requiredFields = ['topic', 'level', 'learningGoal', 'estimatedDuration', 'category', 'userId']
       const missingFields = []
       
       requiredFields.forEach(field => {
@@ -72,31 +72,32 @@ const CreateCourse = () => {
         }
       })
       
-      if (!formData.userId) {
-        missingFields.push('userId')
-      }
-      
       if (missingFields.length > 0) {
         setError(`Missing required fields: ${missingFields.join(', ')}`)
         setLoading(false)
         return
       }
       
+      // Use the content endpoint for course generation
       const response = await axios.post(getApiUrl('/api/content/generate-course'), {
         topic: formData.topic,
         level: formData.level,
         learningGoal: formData.learningGoal,
-        estimatedDuration: parseInt(formData.estimatedDuration),
-        category: formData.category,
+        estimatedDuration: formData.estimatedDuration,
         userId: formData.userId,
-        description: formData.description || `A course about ${formData.topic}`,
-        chapterCount: parseInt(formData.chapterCount || '5')
+        category: formData.category,
+        description: formData.description || `A course about ${formData.topic}`
       })
       
-      setGeneratedCourse(response.data.course)
+      // Handle the response from GitHub AI implementation
+      // The GitHub AI implementation returns the full course object directly
+      setGeneratedCourse(response.data)
       setSuccess(true)
+      console.log('Course generated successfully:', response.data)
+      // Store the course ID for proper redirection
+      const courseId = response.data._id
       setTimeout(() => {
-        navigate('/dashboard')
+        navigate('/dashboard?tab=home')
       }, 3000)
     } catch (err) {
       console.error('Error generating course:', err)

@@ -3,10 +3,10 @@
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 // Base URL for API requests
-// In development, use localhost
+// In development, use the proxy configured in vite.config.js
 // In production, use relative URLs that will be handled by the same domain
 const API_BASE_URL = isDevelopment 
-  ? 'https://course-generator-ai.onrender.com' 
+  ? '' 
   : '';
 
 export const getApiUrl = (endpoint) => {

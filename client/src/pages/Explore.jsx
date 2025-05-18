@@ -23,7 +23,6 @@ const Explore = () => {
     total: 0,
     page: 1,
     limit: 12,
-    totalPages: 0
   })
   const { currentUser } = useSelector(state => state.user)
 
@@ -87,7 +86,7 @@ const Explore = () => {
   
   // Handle page change
   const handlePageChange = (newPage) => {
-    if (newPage < 1 || newPage > pagination.totalPages) return
+    if (newPage < 1 || newPage > pagination) return
     handleFilterChange('page', newPage)
   }
 
@@ -224,7 +223,7 @@ const Explore = () => {
           </div>
           
           {/* Pagination */}
-          {pagination.totalPages > 1 && (
+          {pagination > 1 && (
             <div className="flex justify-center mt-6 sm:mt-8">
               <div className="flex space-x-2">
                 <button
@@ -236,13 +235,13 @@ const Explore = () => {
                 </button>
                 
                 <div className="flex items-center px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-indigo-50 text-indigo-700 rounded-lg">
-                  Page {pagination.page} of {pagination.totalPages}
+                  Page {pagination.page} of {pagination}
                 </div>
                 
                 <button
                   onClick={() => handlePageChange(pagination.page + 1)}
-                  disabled={pagination.page === pagination.totalPages}
-                  className={`px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg ${pagination.page === pagination.totalPages ? 'bg-indigo-100 text-indigo-400 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
+                  disabled={pagination.page === pagination}
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg ${pagination.page === pagination ? 'bg-indigo-100 text-indigo-400 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
                 >
                   Next
                 </button>

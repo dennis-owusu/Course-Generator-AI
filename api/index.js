@@ -7,6 +7,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import contentRoute from './routes/content.route.js'
 import authRoute from './routes/auth.route.js';
+import aiContentRoute from './routes/aiContent.route.js';
 
 dotenv.config(); 
 
@@ -25,6 +26,7 @@ mongoose.connect(process.env.MONGODB_URI).then(() => { console.log('Connected to
  
 app.use('/api/content', contentRoute)
 app.use('/api/auth', authRoute)
+app.use('/api/ai-content', aiContentRoute)
 
 // Serve static files from the public directory in production
 

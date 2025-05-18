@@ -8,12 +8,16 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon api/index.js",
     "start": "node api/index.js",
-    "build": "npm install && npm install --prefix client && npm run build --prefix client"
+    "build": "npm install && npm install --prefix client && npm run build --prefix client",
+    "test-github-ai": "node api/test-github-ai.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@azure-rest/ai-inference": "^1.0.0-beta.6",
+    "@azure/core-auth": "^1.9.0",
+    "@azure/core-sse": "^2.2.0",
     "axios": "^1.9.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.7",
