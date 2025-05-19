@@ -86,7 +86,7 @@ const Explore = () => {
   
   // Handle page change
   const handlePageChange = (newPage) => {
-    if (newPage < 1 || newPage > pagination) return
+    if (newPage < 1 || (pagination && newPage > pagination.totalPages)) return
     handleFilterChange('page', newPage)
   }
 
@@ -212,7 +212,7 @@ const Explore = () => {
         <div className="flex justify-center items-center h-40 sm:h-64">
           <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-2 border-b-2 border-indigo-600"></div>
         </div>
-      ) : courses.length > 0 ? (
+      ) : courses && courses.length > 0 ? (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {courses.map(course => (
@@ -223,31 +223,31 @@ const Explore = () => {
           </div>
           
           {/* Pagination */}
-          {pagination > 1 && (
-            <div className="flex justify-center mt-6 sm:mt-8">
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => handlePageChange(pagination.page - 1)}
-                  disabled={pagination.page === 1}
-                  className={`px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg ${pagination.page === 1 ? 'bg-indigo-100 text-indigo-400 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
-                >
-                  Previous
-                </button>
-                
-                <div className="flex items-center px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-indigo-50 text-indigo-700 rounded-lg">
-                  Page {pagination.page} of {pagination}
-                </div>
-                
-                <button
-                  onClick={() => handlePageChange(pagination.page + 1)}
-                  disabled={pagination.page === pagination}
-                  className={`px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg ${pagination.page === pagination ? 'bg-indigo-100 text-indigo-400 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
-                >
-                  Next
-                </button>
-              </div>
+      {pagination && pagination.totalPages > 1 && (
+        <div className="flex justify-center mt-6 sm:mt-8">
+          <div className="flex space-x-2">
+            <button
+              onClick={() => handlePageChange(pagination.page - 1)}
+              disabled={pagination.page === 1}
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg ${pagination.page === 1 ? 'bg-indigo-100 text-indigo-400 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
+            >
+              Previous
+            </button>
+            
+            <div className="flex items-center px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-indigo-50 text-indigo-700 rounded-lg">
+              Page {pagination.page} of {pagination.totalPages}
             </div>
-          )}
+            
+            <button
+              onClick={() => handlePageChange(pagination.page + 1)}
+              disabled={pagination.page === pagination.totalPages}
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg ${pagination.page === pagination.totalPages ? 'bg-indigo-100 text-indigo-400 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
         </>
       ) : (
         <div className="text-center py-8 sm:py-16 px-4 bg-white rounded-2xl shadow-lg border border-indigo-100 animate-slide-in">
