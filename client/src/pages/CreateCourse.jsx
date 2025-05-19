@@ -77,7 +77,7 @@ const CreateCourse = () => {
         setLoading(false)
         return
       }
-      
+       
       // Use the content endpoint for course generation
       const response = await axios.post(getApiUrl('/api/content/generate-course'), {
         topic: formData.topic,

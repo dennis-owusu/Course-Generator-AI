@@ -15,7 +15,7 @@ const Loader = () => {
        
         {/* Loading Text */}
         <p className="mt-4 text-indigo-900 text-lg font-semibold">Generating Your Course...</p>
-      </div>
+      </div> 
     </div>
   )
 }

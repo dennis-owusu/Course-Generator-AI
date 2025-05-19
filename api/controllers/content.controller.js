@@ -174,7 +174,7 @@ function calculateRelevance(query, title, description) {
      
     return titleScore + descriptionScore;
 }
-
+ 
 // Generate a course with AI
 export const generateCourse = async (req, res, next) => {
     try {
@@ -188,7 +188,7 @@ export const generateCourse = async (req, res, next) => {
                 requiredFields: ['topic', 'level', 'learningGoal', 'estimatedDuration', 'category', 'userId']
             });
         }
-        
+         
         // Validate level and learningGoal against allowed values
         const allowedLevels = ['Beginner', 'Intermediate', 'Advanced'];
         const allowedGoals = ['Career', 'Academic', 'Personal'];

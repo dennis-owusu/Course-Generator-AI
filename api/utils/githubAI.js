@@ -42,4 +42,4 @@ export async function generateWithGitHubAI(prompt) {
         }
         return null;
     }
-}
+} 
