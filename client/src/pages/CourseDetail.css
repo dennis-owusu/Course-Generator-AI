@@ -183,6 +183,78 @@
   background-color: #f8fafc;
 }
 
+/* Lesson Content Container */
+.lesson-content-container {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 2px solid transparent;
+  border-image: linear-gradient(to right, #a5b4fc, #818cf8) 1;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Lesson Content Inner */
+.lesson-content-inner {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+/* Lesson Content Paragraph */
+.lesson-content-paragraph {
+  color: #1f2937;
+  font-size: 1.15rem;
+  line-height: 1.75;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: #ffffff;
+  border-left: 4px solid #a5b4fc;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.lesson-content-paragraph:hover {
+  background: #f8faff;
+}
+
+/* Lesson Content Headings */
+.lesson-content-inner h1,
+.lesson-content-inner h2,
+.lesson-content-inner h3,
+.lesson-content-inner h4 {
+  color: #4f46e5;
+  font-weight: 600;
+  margin: 1.5rem 0 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 2px dashed #e0e7ff;
+}
+
+.lesson-content-inner h1 {
+  font-size: 2rem;
+}
+
+.lesson-content-inner h2 {
+  font-size: 1.75rem;
+}
+
+.lesson-content-inner h3 {
+  font-size: 1.5rem;
+}
+
+.lesson-content-inner h4 {
+  font-size: 1.25rem;
+}
+
+/* Bold and Strong Text */
+.lesson-content-inner strong,
+.lesson-content-inner b {
+  color: #4338ca;
+  font-weight: 700;
+}
+
+
+
 /* Animation for content transitions */
 @keyframes slideIn {
   from {
@@ -194,5 +266,3 @@
     transform: translateY(0);
   }
 }
-
-/* No fallback styles needed */

@@ -6,7 +6,6 @@ import { marked } from 'marked'
 import Header from '@/components/ui/Header'
 import { Button } from '@/components/ui/button'
 
-// Import custom styles for enhanced course content presentation
 import './CourseDetail.css'
 
 const CourseDetail = () => {
@@ -58,19 +57,16 @@ const CourseDetail = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-
   const handleModuleClick = (index) => {
     setActiveModule(index)
-    setActiveLesson(0) // Reset to first lesson when changing modules
+    setActiveLesson(0)
   }
 
   const handleLessonClick = (index) => {
     setActiveLesson(index)
-    // Smooth scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  // Extract YouTube video ID from URL
   const getYouTubeVideoId = (url) => {
     if (!url) return null
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
@@ -163,7 +159,6 @@ const CourseDetail = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar with modules and lessons */}
           <div className="lg:col-span-1">
             <div className="sticky top-4 bg-white p-5 rounded-xl shadow-sm border border-gray-200">
               <h2 className="text-xl font-bold mb-4 text-gray-800 flex items-center">
@@ -209,7 +204,6 @@ const CourseDetail = () => {
             </div>
           </div>
 
-          {/* Main content area */}
           <div className="lg:col-span-3">
             <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-gray-200">
               {currentLesson ? (
@@ -229,7 +223,6 @@ const CourseDetail = () => {
                     </div>
                   )}
                   
-                  {/* Enhanced AI-generated study notes section */}
                   <div className="mb-8 study-notes-container">
                     <div className="study-notes-header">
                       <h3 className="text-xl font-bold flex items-center text-indigo-800">
@@ -261,7 +254,6 @@ const CourseDetail = () => {
                     )}
                   </div>
                   
-                  {/* Summary Section */}
                   <div className="mb-8 bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
                     <h3 className="text-lg font-bold mb-3 text-gray-800 flex items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -274,8 +266,7 @@ const CourseDetail = () => {
                     </div>
                   </div>
                   
-                  {/* Lesson Content Section */}
-                  <div className="mb-8">
+                  <div className="mb-8 lesson-content-container">
                     <details open className="group">
                       <summary className="flex cursor-pointer items-center justify-between rounded-lg bg-indigo-50 px-4 py-3 text-lg font-medium text-indigo-900 hover:bg-indigo-100">
                         <div className="flex items-center gap-2">
@@ -288,13 +279,13 @@ const CourseDetail = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                       </summary>
-                      <div className="mt-4 px-4 pb-4">
-                        <div className="prose prose-slate max-w-none">
+                      <div className="mt-4 px-4 pb-4 lesson-content-inner">
+                        <div className="prose prose-indigo max-w-none">
                           {currentLesson.aiNotes ? (
-                            <div dangerouslySetInnerHTML={{ __html: marked.parse(currentLesson.aiNotes) }}></div>
+                            <div className='text-[1.1rem] text-[#1f2937]' dangerouslySetInnerHTML={{ __html: marked.parse(currentLesson.aiNotes) }}></div>
                           ) : currentLesson.content ? (
                             currentLesson.content.split('\n').map((paragraph, i) => (
-                              <p key={i} className="mb-4 text-gray-700 leading-relaxed">{paragraph}</p>
+                              <p key={i} className=" lesson-content-paragraph">{paragraph}</p>
                             ))
                           ) : (
                             <p className="text-gray-500">No detailed content available for this lesson.</p>
