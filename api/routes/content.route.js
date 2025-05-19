@@ -1,5 +1,5 @@
 import express from 'express';
-import { createContent, generateCourse, getUserCourses, getCourseById } from '../controllers/content.controller.js';
+import { createContent, generateCourse, getUserCourses, getCourseById, getCommunityCoursesController } from '../controllers/content.controller.js';
 
 const router = express.Router();
 
@@ -10,5 +10,6 @@ router.post('/generate-course', generateCourse);
 // Course retrieval routes
 router.get('/user-courses/:userId', getUserCourses);
 router.get('/course/:courseId', getCourseById);
+router.get('/community-courses', getCommunityCoursesController);
 
 export default router;

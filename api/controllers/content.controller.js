@@ -2,9 +2,94 @@ import Content from "../models/content.model.js";
 import axios from 'axios';
 import dotenv from 'dotenv';
 import { generateWithGitHubAI } from '../utils/githubAI.js';
+import mongoose from 'mongoose';
 
 // Ensure environment variables are loaded
 dotenv.config();
+
+// Controller to get community courses (courses created by other users)
+export const getCommunityCoursesController = async (req, res, next) => {
+  try {
+    // Extract query parameters
+    const { 
+      page = 1, 
+      limit = 12, 
+      category, 
+      level, 
+      learningGoal, 
+      search,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      excludeUserId
+    } = req.query;
+    
+    // Build filter object
+    const filter = {};
+    
+    // Filter by category if provided
+    if (category && category !== 'all') {
+      filter.category = category;
+    }
+    
+    // Filter by level if provided
+    if (level) {
+      filter.level = level;
+    }
+    
+    // Filter by learning goal if provided
+    if (learningGoal) {
+      filter.learningGoal = learningGoal;
+    }
+    
+    // Filter by search term if provided
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    // Exclude courses created by the current user if excludeUserId is provided
+    if (excludeUserId) {
+      filter.createdBy = { $ne: excludeUserId };
+    }
+    
+    // Build sort object
+    const sort = {};
+    sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    
+    // Convert page and limit to numbers
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+    
+    // Get total count for pagination
+    const total = await Content.countDocuments(filter);
+    
+    // Get courses with pagination and sorting
+    const courses = await Content.find(filter)
+      .sort(sort)
+      .skip(skip)
+      .limit(limitNum);
+    
+    // Calculate total pages
+    const totalPages = Math.ceil(total / limitNum);
+    
+    res.status(200).json({
+      success: true,
+      courses,
+      pagination: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching community courses:', error);
+    next(error);
+  }
+};
 
 // Helper function to search for YouTube videos with improved relevance and error handling
 async function searchYouTubeVideos(query, maxResults = 3, relevanceThreshold = 0.6) {
