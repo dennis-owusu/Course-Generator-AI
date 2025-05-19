@@ -17,7 +17,14 @@ const __dirname = path.resolve();
 //middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+// Configure CORS to allow requests from both development and production domains
+app.use(cors({
+  origin: [
+    'http://localhost:5173', // Development frontend
+    'https://course-generator-ai.onrender.com' // Production frontend
+  ],
+  credentials: true
+}));
 app.use(cookieParser());
 
 //connect to mongoDB
