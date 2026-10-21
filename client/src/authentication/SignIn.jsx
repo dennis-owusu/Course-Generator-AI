@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { motion, AnimatePresence } from 'framer-motion';
 import { signInStart, signInSuccess, signInFailure } from '../redux/user/userSlice';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import OAuth from '../components/OAuth';
-import { FiMail, FiLock } from 'react-icons/fi';
+import AuthLayout from '@/components/auth/AuthLayout';
+import { FiMail, FiLock, FiAlertCircle } from 'react-icons/fi';
+
+const fieldVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.45, delay: 0.25 + i * 0.1, ease: 'easeOut' },
+  }),
+};
 
 const SignIn = () => {
   const [formData, setFormData] = useState({});
@@ -24,7 +34,6 @@ const SignIn = () => {
     e.preventDefault();
     try {
       dispatch(signInStart());
-      // Replace with your actual API endpoint for signin
       const res = await fetch('/api/auth/signin', {
         method: 'POST',
         headers: {
@@ -33,97 +42,116 @@ const SignIn = () => {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      console.log(data);
       if (data.success === false) {
         dispatch(signInFailure(data.message));
         return;
       }
       dispatch(signInSuccess(data));
-      navigate('/dashboard?tab=home'); // Navigate to home or dashboard after successful signin
+      navigate('/dashboard');
     } catch (error) {
       dispatch(signInFailure(error.message));
     }
   };
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-white p-4'>
-      <div className='w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden'>
-        <div className='bg-indigo-600 p-6 text-center'>
-          <img src='/logo.png' alt='Logo' className='h-12 mx-auto mb-2' />
-          <h1 className='text-3xl font-bold text-white'>Welcome Back</h1>
-          <p className='text-indigo-200 mt-1'>Sign in to continue your learning journey</p>
-        </div>
-        
-        <div className='p-6'>
-          <form onSubmit={handleSubmit} className='space-y-4'>
-            <div className='relative'>
-              <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
-                <FiMail className='text-gray-400' />
-              </div>
-              <Input
-                type='email'
-                placeholder='Email'
-                className='pl-12 w-full placeholder:absolute placeholder:left-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent'
-                id='email'
-                onChange={handleChange}
-                required
-              />
-            </div>
-            
-            <div className='relative'>
-              <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
-                <FiLock className='text-gray-400' />
-              </div>
-              <Input
-                type='password'
-                placeholder='Password'
-                className='pl-12 w-full placeholder:absolute placeholder:left-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent'
-                id='password'
-                onChange={handleChange}
-                required
-              />
-            </div>
+    <AuthLayout
+      title="Welcome back"
+      subtitle="Sign in to continue your learning journey"
+      footer={
+        <p>
+          Don't have an account?{' '}
+          <Link to="/signup" className="text-indigo-400 font-medium hover:text-indigo-300 transition-colors">
+            Sign up
+          </Link>
+        </p>
+      }
+    >
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <motion.div custom={0} variants={fieldVariants} initial="hidden" animate="visible" className="relative group">
+          <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+          <Input
+            type="email"
+            placeholder="Email address"
+            className="pl-11 h-12 w-full bg-white/5 border-white/10 text-slate-100 placeholder:text-slate-500 rounded-xl focus-visible:ring-2 focus-visible:ring-indigo-500/60 focus-visible:border-indigo-500/60 transition-all"
+            id="email"
+            onChange={handleChange}
+            required
+          />
+        </motion.div>
 
-            <Button
-              disabled={loading}
-              type='submit'
-              className='w-full bg-indigo-600 text-white p-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-70'
-            >
+        <motion.div custom={1} variants={fieldVariants} initial="hidden" animate="visible" className="relative group">
+          <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+          <Input
+            type="password"
+            placeholder="Password"
+            className="pl-11 h-12 w-full bg-white/5 border-white/10 text-slate-100 placeholder:text-slate-500 rounded-xl focus-visible:ring-2 focus-visible:ring-indigo-500/60 focus-visible:border-indigo-500/60 transition-all"
+            id="password"
+            onChange={handleChange}
+            required
+          />
+        </motion.div>
+
+        <motion.div custom={2} variants={fieldVariants} initial="hidden" animate="visible">
+          <motion.button
+            disabled={loading}
+            type="submit"
+            whileHover={{ scale: loading ? 1 : 1.015 }}
+            whileTap={{ scale: loading ? 1 : 0.985 }}
+            className="relative w-full h-12 rounded-xl font-semibold text-white overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-indigo-950/50"
+          >
+            <span className="relative z-10 flex items-center justify-center gap-2">
+              {loading && (
+                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              )}
               {loading ? 'Signing in...' : 'Sign In'}
-            </Button>
-          </form>
-          
-          <div className='mt-6'>
-            <div className='relative'>
-              <div className='absolute inset-0 flex items-center'>
-                <div className='w-full border-t border-gray-300'></div>
-              </div>
-              <div className='relative flex justify-center text-sm'>
-                <span className='px-2 bg-white text-gray-500'>Or continue with</span>
-              </div>
-            </div>
-            
-            <div className='mt-6'>
-              <OAuth />
-            </div>
+            </span>
+          </motion.button>
+        </motion.div>
+      </form>
+
+      <motion.div
+        custom={3}
+        variants={fieldVariants}
+        initial="hidden"
+        animate="visible"
+        className="mt-7"
+      >
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-white/10" />
           </div>
-          
-          <div className='mt-6 text-center'>
-            <p className='text-gray-600'>Don't have an account? 
-              <Link to='/signup' className='text-indigo-600 font-medium hover:text-indigo-500 ml-1'>
-                Sign up
-              </Link>
-            </p>
+          <div className="relative flex justify-center text-xs uppercase tracking-wider">
+            <span className="px-3 bg-[#0c1222] text-slate-500">Or continue with</span>
           </div>
-          
-          {error && (
-            <div className='mt-4 bg-red-50 text-red-600 p-3 rounded-lg text-sm'>
-              {error}
-            </div>
-          )}
         </div>
-      </div>
-    </div>
+
+        <div className="mt-5">
+          <OAuth />
+        </div>
+      </motion.div>
+
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            key={error}
+            initial={{ opacity: 0, x: 0, height: 0 }}
+            animate={{
+              opacity: 1,
+              height: 'auto',
+              x: [0, -8, 8, -5, 5, 0],
+              transition: { duration: 0.45, ease: 'easeOut' },
+            }}
+            exit={{ opacity: 0, height: 0, transition: { duration: 0.25 } }}
+            className="overflow-hidden"
+          >
+            <div className="mt-5 flex items-center gap-2 bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm">
+              <FiAlertCircle className="shrink-0" />
+              <span>{error}</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </AuthLayout>
   );
 };
 

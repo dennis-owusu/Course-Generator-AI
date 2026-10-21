@@ -1,8 +1,15 @@
 import Content from "../models/content.model.js";
+import User from "../models/user.model.js";
+import Enrollment from "../models/enrollment.model.js";
+import AcademicTerm from "../models/academicTerm.model.js";
 import axios from 'axios';
 import dotenv from 'dotenv';
 import { generateWithGitHubAI } from '../utils/githubAI.js';
+import { POINTS, awardPoints, checkCourseQuota, incrementCourseUsage } from '../utils/gamification.js';
+import { createNotification } from './notification.controller.js';
 import mongoose from 'mongoose';
+import fs from 'fs';
+import path from 'path';
 
 // Ensure environment variables are loaded
 dotenv.config();
@@ -208,7 +215,22 @@ export const generateCourse = async (req, res, next) => {
                 allowedValues: allowedGoals
             });
         }
-        
+
+        // Enforce the free plan's monthly AI-course limit
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        const quota = checkCourseQuota(user);
+        if (!quota.allowed) {
+            return res.status(403).json({
+                success: false,
+                code: 'PLAN_LIMIT_REACHED',
+                message: `You have used all ${quota.limit} free AI courses for this month. Upgrade to PRO for unlimited courses.`,
+                aiCourses: { used: quota.used, limit: quota.limit, remaining: 0 }
+            });
+        }
+
         console.log(`Generating ${level} level course on "${topic}" for ${learningGoal} purposes...`);
         
         // Generate a more comprehensive course structure based on difficulty level
@@ -226,6 +248,29 @@ export const generateCourse = async (req, res, next) => {
         console.log('Saving course to database...');
         const newContent = new Content(courseStructure);
         await newContent.save();
+
+        // Track plan usage and reward the learner
+        await incrementCourseUsage(user);
+        const coursesCreated = await Content.countDocuments({ createdBy: userId });
+        await awardPoints(userId, POINTS.CREATE_COURSE, { coursesCreated });
+
+        // Notify user
+        await createNotification({
+          recipient: userId,
+          type: 'course_created',
+          title: 'Course created',
+          message: `Your AI-generated course "${newContent.title}" is ready.`,
+          link: `/dashboard/my-courses`,
+          metadata: { courseId: newContent._id },
+        });
+
+        // Auto-enroll creator in the course (use active term if available)
+        const activeTerm = await AcademicTerm.findOne({ isActive: true }).select('_id');
+        await Enrollment.create({
+          student: userId,
+          course: newContent._id,
+          term: activeTerm?._id || null,
+        });
         
         // Calculate course statistics for response
         const totalModules = courseStructure.modules.length;
@@ -835,7 +880,11 @@ export const createContent = async(req, res, next) => {
 // Get all courses for a user
 export const getUserCourses = async (req, res, next) => {
     const { userId } = req.params;
-    
+
+    if (req.userId !== userId && req.userRole !== 'admin') {
+        return next(errorHandler(403, 'Forbidden'));
+    }
+
     try {
         const courses = await Content.find({ createdBy: userId });
         res.status(200).json(courses);
@@ -854,6 +903,67 @@ export const getCourseById = async (req, res, next) => {
             return res.status(404).json({ message: 'Course not found' });
         }
         res.status(200).json(course);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Update a course
+export const updateCourse = async (req, res, next) => {
+    const { courseId } = req.params;
+    const { title, description, level, learningGoal, estimatedDuration, category } = req.body;
+
+    try {
+        const course = await Content.findById(courseId);
+        if (!course) {
+            return res.status(404).json({ success: false, message: 'Course not found' });
+        }
+
+        const isOwner = course.createdBy?.toString() === req.userId;
+        if (!isOwner && req.userRole !== 'admin' && req.userRole !== 'teacher') {
+            return next(errorHandler(403, 'Forbidden'));
+        }
+
+        if (title !== undefined) course.title = title;
+        if (description !== undefined) course.description = description;
+        if (level !== undefined) course.level = level;
+        if (learningGoal !== undefined) course.learningGoal = learningGoal;
+        if (estimatedDuration !== undefined) course.estimatedDuration = estimatedDuration;
+        if (category !== undefined) course.category = category;
+        course.updatedAt = Date.now();
+
+        await course.save();
+        res.status(200).json({ success: true, message: 'Course updated successfully', course });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Upload a banner image for a course
+export const uploadCourseBanner = async (req, res, next) => {
+    const { courseId } = req.params;
+
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: 'No image file uploaded' });
+        }
+
+        const course = await Content.findById(courseId);
+        if (!course) {
+            return res.status(404).json({ success: false, message: 'Course not found' });
+        }
+
+        // Remove the previous banner file if it was an uploaded one
+        if (course.thumbnail && course.thumbnail.startsWith('/uploads/')) {
+            const oldFilePath = path.join(process.cwd(), course.thumbnail);
+            fs.promises.unlink(oldFilePath).catch(() => {});
+        }
+
+        course.thumbnail = `/uploads/${req.file.filename}`;
+        course.updatedAt = Date.now();
+        await course.save();
+
+        res.status(200).json({ success: true, message: 'Banner uploaded successfully', thumbnail: course.thumbnail, course });
     } catch (error) {
         next(error);
     }

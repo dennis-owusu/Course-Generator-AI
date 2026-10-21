@@ -1,63 +1,73 @@
-# Deployment Guide for Course Generator AI
+# NurseHub Deployment Guide
 
-## Deployment Issues Fixed
+## Prerequisites
 
-The following issues were addressed to ensure successful deployment:
+- Node.js 18+
+- MongoDB cluster (MongoDB Atlas recommended)
+- A server or platform with support for Node.js (Render, Railway, VPS, etc.)
+- Domain with HTTPS enabled for production
 
-1. **Infinite Build Loop**: Fixed recursive build script in package.json that was causing an infinite loop during deployment.
+## Environment variables
 
-2. **Static File Serving**: Added configuration to serve the React frontend from the Express backend in production.
+Copy `.env.example` to `.env` and fill in real values:
 
-3. **Cross-Platform Compatibility**: Updated build scripts to work on both Windows and Unix-based systems.
-
-## Deployment Steps
-
-### Prerequisites
-
-- Node.js and npm installed
-- MongoDB database
-- GitHub API token (for GPT-4o API)
-- YouTube Data API key
-
-### Environment Variables
-
-Ensure the following environment variables are set in your deployment platform:
-
-```
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-GPT40_API_KEY=your_github_gpt4o_api_key
-YOUTUBE_API_KEY=your_youtube_api_key
-NODE_ENV=production
+```bash
+cp .env.example .env
 ```
 
-### Deployment Process
+### Required
 
-1. Push your code to your repository
+- `MONGODB_URI` — production MongoDB connection string
+- `JWT_SECRET` — strong random string (min 32 chars)
+- `NODE_ENV=production`
+- `PORT` — usually provided by the platform
 
-2. Set up a new Web Service on Render
-   - Connect your repository
-   - Select the Node.js environment
-   - Set the build command to: `npm run build`
-   - Set the start command to: `npm start`
-   - Add the required environment variables
+### Optional
 
-3. Deploy the application
+- `CLIENT_URL` — production frontend URL for CORS
+- `GITHUB_TOKEN` — enables real AI responses in the Study Assistant
+- `YOUTUBE_API_KEY` — enables YouTube video enrichment in generated courses
+- `MONGODB_TEST_URI` — dedicated test database (recommended for CI)
 
-## Build Process
+## Build
 
-The build process now follows these steps:
+```bash
+npm install
+npm run build   # installs deps and builds the React client
+```
 
-1. Installs server dependencies
-2. Builds the React client application
-3. Copies the client build files to the public directory
-4. Serves the static files in production mode
+## Start
 
-## Troubleshooting
+```bash
+npm start
+```
 
-If you encounter deployment issues:
+The Express server serves the built client from `client/dist` and API routes under `/api`.
 
-1. Check the deployment logs for specific error messages
-2. Verify all environment variables are correctly set
-3. Ensure MongoDB connection is accessible from your deployment platform
-4. Check that API keys are valid and have the necessary permissions
+## Account provisioning
+
+- New registrations default to the `student` role.
+- To create the first administrator, use a secure MongoDB shell or one-time script; never ship a default admin password in code.
+- Teachers must be promoted by an administrator.
+
+## Security checklist
+
+- HTTPS is required in production so cookies are transmitted securely.
+- `JWT_SECRET` must be unique and not committed to version control.
+- MongoDB network access should be restricted to the application server.
+- Uploaded documents are protected behind authentication (`/uploads/documents`).
+- Public images (`/uploads/images`) are appropriate only for course banners and avatars.
+- Keep dependencies up to date and run `npm audit` regularly.
+
+## Health check
+
+Visit `/api/health` (if implemented) or confirm the server responds on the configured port.
+
+## Running tests
+
+```bash
+npm test
+```
+
+Tests use `MONGODB_TEST_URI` if provided. If not, they fall back to `mongodb-memory-server`, which downloads a MongoDB binary on first run. On slow or resource-constrained machines this download can time out; rerun the suite or provide a local/remote `MONGODB_TEST_URI` for stable CI runs.
+

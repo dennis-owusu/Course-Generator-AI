@@ -31,7 +31,20 @@ const lessonSchema = new Schema({
         question: String,
         options: [String],
         correctAnswer: Number // index of correct option
-    }]
+    }],
+    // WAEC-style past/exam practice questions for this lesson (lazily generated, cached)
+    waecQuestions: [{
+        question: String,
+        options: [String],
+        correctAnswer: Number, // index of correct option
+        explanation: String,
+        year: String, // e.g. "2022" — the past paper the question is styled on
+    }],
+    // Cached "Learn-at-Your-Level" explanations
+    explanations: {
+        JHS: { type: String, required: false },
+        SHS: { type: String, required: false },
+    }
 });
 
 const moduleSchema = new Schema({
@@ -87,6 +100,10 @@ const contentSchema = new Schema({
         ref: 'User',
         required: true
     },
+    assignedTeachers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+    }],
     // Community and engagement metrics
     isPublic: {
         type: Boolean,

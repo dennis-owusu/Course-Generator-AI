@@ -1,196 +1,158 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Button } from '../components/ui/button'
 
+const FREE_FEATURES = [
+  '2 AI courses per month',
+  '1 free live class per week',
+  'Last 7 days of class recordings',
+  'Basic quizzes & simple progress tracking',
+  'Community study groups',
+]
+
+const PRO_FEATURES = [
+  'Unlimited AI courses + unlimited homework help',
+  'File uploads — assignment instructions, notes, or a photo of a question',
+  'Photo-to-Answer — snap any question or past paper, AI solves it step by step',
+  'Exam Countdown Mode — daily AI study plan before your exam, WhatsApp reminders',
+  'Full recording library, forever',
+  'Mock Exam Simulator — timed tests, grading, weak-topic report',
+  'AI builds a course for your weak areas after each mock exam',
+  'Voice-note questions — record your question, AI answers',
+  'Priority help from the human tutor',
+  'Weekly Quiz Competition — top 10 win free PRO',
+  'Points, badges & leaderboard',
+  'Learn-at-Your-Level — JHS or SHS explanations, instantly',
+  'Offline Study Packs — download any course as PDF',
+]
+
+const CheckIcon = () => (
+  <svg className="h-4 w-4 text-indigo-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+  </svg>
+)
+
+const XIcon = () => (
+  <svg className="h-4 w-4 text-gray-300 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+  </svg>
+)
+
+const FeatureRow = ({ label, included }) => (
+  <li className={`flex items-start text-sm ${included ? 'text-gray-700' : 'text-gray-400'}`}>
+    {included ? <CheckIcon /> : <XIcon />}
+    <span>{label}</span>
+  </li>
+)
+
 const Upgrade = () => {
-  const plans = [
-    {
-      name: 'Basic',
-      price: 'Free',
-      features: [
-        'Create up to 3 courses',
-        'Basic course templates',
-        'Standard AI-generated content',
-        'Email support',
-      ],
-      buttonText: 'Current Plan',
-      highlighted: false,
-      disabled: true
-    },
-    {
-      name: 'Pro',
-      price: '$9.99',
-      period: 'per month',
-      features: [
-        'Create unlimited courses',
-        'Advanced course templates',
-        'Enhanced AI-generated content',
-        'Custom quizzes and assessments',
-        'Priority email support',
-        'Download courses as PDF'
-      ],
-      buttonText: 'Upgrade Now',
-      highlighted: true,
-      disabled: false
-    },
-    {
-      name: 'Enterprise',
-      price: '$29.99',
-      period: 'per month',
-      features: [
-        'Everything in Pro plan',
-        'Team collaboration features',
-        'Advanced analytics',
-        'White-label options',
-        'API access',
-        'Dedicated support manager',
-        'Custom integrations'
-      ],
-      buttonText: 'Contact Sales',
-      highlighted: false,
-      disabled: false
-    }
-  ]
+  const [paymentMethod, setPaymentMethod] = useState('momo')
+  const [loading, setLoading] = useState(false)
+
+  const handleUpgrade = async () => {
+    setLoading(true)
+    // Payment integration point — connect to MoMo / Paystack checkout here
+    setLoading(false)
+  }
 
   return (
-    <div className="px-3 sm:mx-6 lg:mx-10 my-4 sm:my-8">
-      {/* Header Section */}
-      <div className="text-center mb-8 sm:mb-12 animate-fade-in">
-        <h2 className="text-2xl sm:text-3xl font-bold text-indigo-900 mb-3 sm:mb-4">Upgrade Your Learning Experience</h2>
-        <p className="text-sm sm:text-base text-indigo-700 max-w-2xl mx-auto px-2 sm:px-0">
-          Unlock premium features to enhance your learning journey with advanced AI-generated courses, 
-          custom assessments, and more.
-        </p>
-      </div>
+    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
 
-      {/* Pricing Plans */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-10 sm:mb-16">
-        {plans.map((plan, index) => (
-          <div 
-            key={index} 
-            className={`bg-white rounded-2xl overflow-hidden shadow-lg border transition-all ${plan.highlighted 
-              ? 'border-indigo-500 transform scale-105 shadow-xl' 
-              : 'border-indigo-100 hover:shadow-xl hover:-translate-y-1'}`}
-          >
-            <div className={`p-4 sm:p-6 ${plan.highlighted ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-900'}`}>
-              <h3 className="text-lg sm:text-xl font-bold mb-1">{plan.name}</h3>
-              <div className="flex items-end">
-                <span className="text-2xl sm:text-3xl font-bold">{plan.price}</span>
-                {plan.period && <span className="ml-1 text-xs sm:text-sm opacity-80">{plan.period}</span>}
+        {/* Header */}
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-bold text-indigo-900 mb-3">Learn Without Limits</h1>
+          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            Free forever for the basics. Go PRO for unlimited AI help, mock exams,
+            and exam-day confidence — pay easily with Mobile Money.
+          </p>
+        </div>
+
+        {/* Pricing cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+
+          {/* Free */}
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 flex flex-col">
+            <div className="mb-5">
+              <h2 className="text-xl font-bold text-indigo-900 mb-1">Free</h2>
+              <div className="flex items-end gap-1">
+                <span className="text-3xl font-bold text-gray-800">GHS 0</span>
+                <span className="text-sm text-gray-500 mb-1">/ month</span>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">Everything you need to start learning</p>
+            </div>
+            <ul className="space-y-2.5 mb-6 flex-1">
+              {FREE_FEATURES.map(f => <FeatureRow key={f} label={f} included={true} />)}
+              {PRO_FEATURES.slice(0, 5).map(f => <FeatureRow key={f} label={f} included={false} />)}
+              <li className="text-xs text-gray-400 pl-6">+ more with PRO</li>
+            </ul>
+            <Button disabled className="w-full bg-gray-100 text-gray-400 cursor-default">
+              Current Plan
+            </Button>
+          </div>
+
+          {/* PRO */}
+          <div className="bg-white rounded-2xl border-2 border-indigo-600 shadow-lg p-6 flex flex-col relative">
+            <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+              RECOMMENDED
+            </span>
+            <div className="mb-5">
+              <h2 className="text-xl font-bold text-indigo-900 mb-1">PRO</h2>
+              <div className="flex items-end gap-1">
+                <span className="text-3xl font-bold text-gray-800">GHS 75</span>
+                <span className="text-sm text-gray-500 mb-1">/ month</span>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">Everything in Free, plus:</p>
+            </div>
+            <ul className="space-y-2.5 mb-6 flex-1">
+              {PRO_FEATURES.map(f => <FeatureRow key={f} label={f} included={true} />)}
+            </ul>
+
+            {/* Payment method selector */}
+            <div className="mb-4">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Pay with</p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setPaymentMethod('momo')}
+                  className={`py-2 px-3 rounded-lg border text-sm font-medium transition-colors ${
+                    paymentMethod === 'momo'
+                      ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                      : 'border-gray-200 text-gray-600 hover:border-indigo-300'
+                  }`}
+                >
+                  Mobile Money
+                </button>
+                <button
+                  onClick={() => setPaymentMethod('paystack')}
+                  className={`py-2 px-3 rounded-lg border text-sm font-medium transition-colors ${
+                    paymentMethod === 'paystack'
+                      ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                      : 'border-gray-200 text-gray-600 hover:border-indigo-300'
+                  }`}
+                >
+                  Card (Paystack)
+                </button>
               </div>
             </div>
 
-            <div className="p-4 sm:p-6">
-              <ul className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
-                {plan.features.map((feature, i) => (
-                  <li key={i} className="flex items-start">
-                    <svg 
-                      className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-500 mr-2 mt-0.5" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24" 
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        strokeWidth="2" 
-                        d="M5 13l4 4L19 7"
-                      ></path>
-                    </svg>
-                    <span className="text-xs sm:text-sm text-gray-700">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Button
-                disabled={plan.disabled}
-                className={`w-full py-2 sm:py-3 text-xs sm:text-sm ${plan.highlighted 
-                  ? 'bg-indigo-600 hover:bg-indigo-700 text-white' 
-                  : plan.disabled 
-                    ? 'bg-gray-100 text-gray-500' 
-                    : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'}`}
-              >
-                {plan.buttonText}
-              </Button>
-            </div>
+            <Button
+              onClick={handleUpgrade}
+              disabled={loading}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3"
+            >
+              {loading
+                ? 'Processing...'
+                : `Continue with ${paymentMethod === 'momo' ? 'Mobile Money' : 'Paystack'} — GHS 75/mo`}
+            </Button>
+            <p className="text-xs text-gray-400 text-center mt-2">Cancel anytime. Secure payment.</p>
           </div>
-        ))}
-      </div>
-
-      {/* Features Showcase */}
-      <div className="bg-white rounded-2xl p-4 sm:p-8 shadow-lg border border-indigo-100 mb-8 sm:mb-12">
-        <h3 className="text-xl sm:text-2xl font-bold text-indigo-900 mb-6 sm:mb-8 text-center">Premium Features</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {[
-            {
-              title: 'Advanced AI Course Generation',
-              description: 'Create more sophisticated and detailed courses with our enhanced AI algorithms.',
-              icon: '🧠'
-            },
-            {
-              title: 'Custom Assessments',
-              description: 'Design personalized quizzes and tests to evaluate learning progress.',
-              icon: '📝'
-            },
-            {
-              title: 'Interactive Learning Materials',
-              description: 'Access interactive exercises and materials to enhance engagement.',
-              icon: '🔄'
-            },
-            {
-              title: 'Progress Analytics',
-              description: 'Track learning progress with detailed analytics and insights.',
-              icon: '📊'
-            },
-            {
-              title: 'Course Export Options',
-              description: 'Export your courses in multiple formats including PDF and SCORM.',
-              icon: '📤'
-            },
-            {
-              title: 'Priority Support',
-              description: 'Get faster responses and dedicated assistance from our support team.',
-              icon: '🛎️'
-            }
-          ].map((feature, index) => (
-            <div key={index} className="flex flex-col items-center text-center p-3 sm:p-4 rounded-xl hover:bg-indigo-50 transition-all">
-              <span className="text-3xl sm:text-4xl mb-3 sm:mb-4">{feature.icon}</span>
-              <h4 className="text-base sm:text-lg font-semibold text-indigo-900 mb-1 sm:mb-2">{feature.title}</h4>
-              <p className="text-xs sm:text-sm text-gray-700">{feature.description}</p>
-            </div>
-          ))}
         </div>
-      </div>
 
-      {/* FAQ Section */}
-      <div className="bg-white rounded-2xl p-4 sm:p-8 shadow-lg border border-indigo-100">
-        <h3 className="text-xl sm:text-2xl font-bold text-indigo-900 mb-6 sm:mb-8 text-center">Frequently Asked Questions</h3>
-        
-        <div className="space-y-4 sm:space-y-6 max-w-3xl mx-auto">
-          {[
-            {
-              question: 'How do I upgrade my account?',
-              answer: 'Simply select the plan that best fits your needs and click the upgrade button. You\'ll be guided through our secure payment process.'
-            },
-            {
-              question: 'Can I cancel my subscription anytime?',
-              answer: 'Yes, you can cancel your subscription at any time. Your premium features will remain active until the end of your billing period.'
-            },
-            {
-              question: 'Is there a free trial for premium plans?',
-              answer: 'We offer a 7-day free trial for our Pro plan so you can experience all the premium features before committing.'
-            },
-            {
-              question: 'What payment methods do you accept?',
-              answer: 'We accept all major credit cards, PayPal, and bank transfers for Enterprise plans.'
-            }
-          ].map((faq, index) => (
-            <div key={index} className="border-b border-indigo-100 pb-3 sm:pb-4">
-              <h4 className="text-base sm:text-lg font-semibold text-indigo-900 mb-1 sm:mb-2">{faq.question}</h4>
-              <p className="text-xs sm:text-sm text-gray-700">{faq.answer}</p>
-            </div>
-          ))}
+        {/* Note */}
+        <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-5 text-center">
+          <p className="text-sm text-indigo-800">
+            Free includes <strong>2 AI courses per month</strong> and <strong>1 live class per week</strong>.
+            PRO removes all limits and unlocks the full exam-prep toolkit for <strong>GHS 75/month</strong>.
+          </p>
         </div>
       </div>
     </div>

@@ -5,11 +5,15 @@ import jwt from 'jsonwebtoken';
 
 // Signup Controller
 export const signup = async (req, res, next) => {
-    const { username, email, password } = req.body;
+    const { username, email, password, role, qualifications, department } = req.body;
 
     if (!username || !email || !password || username === '' || email === '' || password === '') {
         return next(errorHandler(400, 'All fields are required'));
     }
+
+    // Only allow requesting student or teacher roles during signup; admin must be promoted later
+    const requestedRole = role === 'teacher' ? 'teacher' : 'student';
+    const teacherStatus = requestedRole === 'teacher' ? 'pending' : 'not_applicable';
 
     const hashedPassword = bcryptjs.hashSync(password, 10);
 
@@ -17,11 +21,23 @@ export const signup = async (req, res, next) => {
         username,
         email,
         password: hashedPassword,
+        role: requestedRole,
+        teacherStatus,
+        teacherApplication: requestedRole === 'teacher' ? {
+            qualifications: qualifications || '',
+            department: department || null,
+            submittedAt: new Date(),
+        } : undefined,
     });
 
     try {
         await newUser.save();
-        res.status(201).json({ message: 'User created successfully' });
+        res.status(201).json({
+            message: requestedRole === 'teacher'
+                ? 'Teacher account created successfully. Your application is pending verification.'
+                : 'User created successfully',
+            user: { _id: newUser._id, username: newUser.username, email: newUser.email, role: newUser.role, teacherStatus: newUser.teacherStatus },
+        });
     } catch (error) {
         // Handle potential duplicate key errors (username/email)
         if (error.code === 11000) {
@@ -41,7 +57,7 @@ export const signin = async (req, res, next) => {
     }
 
     try {
-        const validUser = await User.findOne({ email });
+        const validUser = await User.findOne({ email }).select('+password');
         if (!validUser) {
             return next(errorHandler(404, 'User not found'));
         }
@@ -51,22 +67,23 @@ export const signin = async (req, res, next) => {
         }
 
         // Generate JWT token (ensure JWT_SECRET is in your .env)
-        const token = jwt.sign(
-            { id: validUser._id, username: validUser.username }, // Include necessary user info
-            process.env.JWT_SECRET, 
-            { expiresIn: '24h' } // Token expiration time
-        );
+    const token = jwt.sign(
+      { id: validUser._id, username: validUser.username, role: validUser.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
 
         // Separate password from the rest of the user data
         const { password: _, ...rest } = validUser._doc;
 
         res.status(200)
-           .cookie('access_token', token, { 
-               httpOnly: true, // Cookie cannot be accessed by client-side scripts
-               // secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS)
-               // sameSite: 'Strict' // Helps prevent CSRF attacks
+           .cookie('access_token', token, {
+               httpOnly: true,
+               secure: process.env.NODE_ENV === 'production',
+               sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+               maxAge: 24 * 60 * 60 * 1000,
             })
-           .json(rest); // Send user data (without password) back
+           .json(rest);
 
     } catch (error) {
         next(error);
@@ -81,9 +98,14 @@ export const google = async (req, res, next) => {
         const user = await User.findOne({ email });
         if (user) {
             // User exists, sign them in
-            const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            const token = jwt.sign({ id: user._id, username: user.username, role: user.role }, process.env.JWT_SECRET, { expiresIn: '24h' });
             const { password: _, ...rest } = user._doc;
-            res.status(200).cookie('access_token', token, { httpOnly: true }).json(rest);
+            res.status(200).cookie('access_token', token, {
+               httpOnly: true,
+               secure: process.env.NODE_ENV === 'production',
+               sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+               maxAge: 24 * 60 * 60 * 1000,
+            }).json(rest);
         } else {
             // User doesn't exist, create a new user
             // Generate a random password since Google OAuth doesn't provide one
@@ -103,9 +125,14 @@ export const google = async (req, res, next) => {
                 googleId: req.body.googleId // Assuming googleId is sent from frontend
             });
             await newUser.save();
-            const token = jwt.sign({ id: newUser._id, username: newUser.username }, process.env.JWT_SECRET, { expiresIn: '24h' });
+            const token = jwt.sign({ id: newUser._id, username: newUser.username, role: newUser.role }, process.env.JWT_SECRET, { expiresIn: '24h' });
             const { password: _, ...rest } = newUser._doc;
-            res.status(201).cookie('access_token', token, { httpOnly: true }).json(rest);
+            res.status(201).cookie('access_token', token, {
+               httpOnly: true,
+               secure: process.env.NODE_ENV === 'production',
+               sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+               maxAge: 24 * 60 * 60 * 1000,
+            }).json(rest);
         }
     } catch (error) {
         next(error);
